@@ -7,14 +7,17 @@ function Sidebar() {
     const handleLogout = () => {
         localStorage.removeItem('jwt');
         localStorage.removeItem('role');
+        localStorage.removeItem('name');
         navigate('/login');
     };
+
+    const adminName = localStorage.getItem('name') || 'Admin';
 
     return (
         <aside className="sidebar">
             <div className="sidebar-header">
-                <h1 className="brand-title">Owl Code</h1>
-                <p className="brand-subtitle">Admin Portal</p>
+                <h1 className="brand-title">Owl Coder</h1>
+                <p className="brand-subtitle">Hello, {adminName}</p>
             </div>
 
             <nav className="sidebar-nav">

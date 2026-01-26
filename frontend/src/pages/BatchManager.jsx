@@ -53,7 +53,7 @@ function BatchManager() {
             const [batchRes, courseRes, trainerRes] = await Promise.all([
                 api.get('/admin/batch'),
                 api.get('/admin/course'),
-                api.get('/admin/trainers'),
+                api.get('/admin/trainers?all=true'),
             ]);
             setBatches(batchRes.data || []);
             setCourses(courseRes.data || []);

@@ -18,27 +18,38 @@
     top: 100%;
     left: 0;
     right: 0;
-    background: rgba(30, 30, 35, 0.95);
+    background: var(--bg-surface);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     z-index: 1000;
     max-height: 200px;
     overflow-y: auto;
     margin-top: 5px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-lg);
 }
 
 .search-result-item {
     padding: 10px 15px;
     cursor: pointer;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border-color);
     transition: background 0.2s;
     font-size: 0.9rem;
+    color: var(--text-primary);
 }
 
 .search-result-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--bg-hover, rgba(0, 0, 0, 0.05));
+    /* Fallback if bg-hover undefined, but usually defined */
+}
+
+/* Use a slightly darker hover for dark mode via media query if needed,
+   but var usually handles it. Assuming var(--bg-hover) is set.
+   If not, opacity trick: */
+@media (prefers-color-scheme: dark) {
+    .search-result-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
 }
 
 .search-result-name {
@@ -47,13 +58,13 @@
 
 .search-result-email {
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-muted);
 }
 
 .no-results {
     padding: 15px;
     text-align: center;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
     font-size: 0.85rem;
 }
 

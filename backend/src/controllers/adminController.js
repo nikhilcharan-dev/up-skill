@@ -602,3 +602,49 @@ export const createTrainer = async (req, res) => {
         res.status(500).json({ msg: err.message });
     }
 };
+
+// Get Dashboard Stats
+export const getDashboardStats = async (req, res) => {
+    try {
+        const totalCourses = await Course.countDocuments();
+        const totalBatches = await Batch.countDocuments();
+        const totalTrainers = await User.countDocuments({ role: 'trainer' });
+        const totalTrainees = await User.countDocuments({ role: 'trainee' });
+
+        // Trainees per Batch Distribution
+        const batchDistribution = await Batch.aggregate([
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'trainees',
+                    foreignField: '_id',
+                    as: 'traineeDetails'
+                }
+            },
+            {
+                $project: {
+                    name: 1,
+                    count: { $size: "$trainees" } // or $traineeDetails if using lookup, but trainees array length is enough if accurate
+                }
+            },
+            { $sort: { count: -1 } }, // Show largest batches first
+            { $limit: 5 } // Top 5 batches
+        ]);
+
+        res.json({
+            counts: {
+                courses: totalCourses,
+                batches: totalBatches,
+                trainers: totalTrainers,
+                trainees: totalTrainees
+            },
+            charts: {
+                batchDistribution
+            }
+        });
+    } catch (err) {
+        console.error('getDashboardStats Error:', err);
+        res.status(500).json({ msg: err.message });
+    }
+};
+

@@ -18,10 +18,11 @@ function Login() {
 
         try {
             const response = await api.post('/auth/login', { email, password });
-            const { token, role } = response.data;
+            const { token, role, name } = response.data;
 
             localStorage.setItem('jwt', token);
             localStorage.setItem('role', role);
+            localStorage.setItem('name', name);
 
             // Redirect based on role
             if (role === 'admin' || role === 'trainer') {

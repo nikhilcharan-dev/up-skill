@@ -20,7 +20,8 @@ import {
     generateSchedule,
     uploadTrainerNotes,
     notesUpload,
-    createTrainer
+    createTrainer,
+    getDashboardStats
 } from '../controllers/adminController.js';
 
 const router = express.Router();
@@ -49,5 +50,14 @@ router.get('/trainees', authorizeRoles('admin', 'trainer'), getAllTrainees);
 router.get('/trainers', authorizeRoles('admin'), getAllTrainers);
 router.post('/trainers', authorizeRoles('admin'), createTrainer);
 router.delete('/trainee/:id', authorizeRoles('admin'), deleteTrainee);
+
+// Dashboard Stats
+// Dashboard Stats
+router.get('/stats', authorizeRoles('admin'), getDashboardStats);
+
+// Coding Profile Routes
+import { getCodingProfile, updateCodingProfile } from '../controllers/codingProfileController.js';
+router.get('/trainee/:userId/coding-profile', authorizeRoles('admin', 'trainer', 'trainee'), getCodingProfile);
+router.put('/trainee/:userId/coding-profile', authorizeRoles('admin', 'trainer'), updateCodingProfile);
 
 export default router;

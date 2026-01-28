@@ -1,9 +1,11 @@
 /* TraineeList.css */
 
 .page-header-column {
-    align-items: flex-start;
+    align-items: flex-start !important;
+    text-align: left !important;
     flex-direction: column;
     gap: 1.5rem;
+    width: 100%;
 }
 
 .search-container {
@@ -163,4 +165,14 @@
 .modal-footer button {
     border-radius: 12px;
     padding: 0.8rem 2.5rem;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
 }

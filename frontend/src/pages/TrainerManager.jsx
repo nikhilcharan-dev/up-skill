@@ -82,25 +82,23 @@ function TrainerManager() {
     return (
         <div className="page">
             <div className="container">
-                <div className="page-header">
+                <div className="page-header page-header-column">
                     <div>
                         <h1>Trainer Management</h1>
                         <p className="text-secondary">Manage trainer accounts and credentials</p>
                     </div>
-                </div>
-
-                <div className="flex justify-between items-center mb-6">
-                    <div className="search-container" style={{ maxWidth: '400px' }}>
-                        {/* <span className="search-icon"></span> */}
-                        <input
-                            type="text"
-                            className="form-input search-input"
-                            placeholder="Search by name or email..."
-                            value={search}
-                            onChange={handleSearchChange}
-                        />
+                    <div className="flex justify-between items-center w-full">
+                        <div className="search-container">
+                            <input
+                                type="text"
+                                className="form-input search-input"
+                                placeholder="Search by name or email..."
+                                value={search}
+                                onChange={handleSearchChange}
+                            />
+                        </div>
+                        <Button variant="primary" onClick={() => setShowCreateModal(true)}>+ Add Trainer</Button>
                     </div>
-                    <Button variant="primary" onClick={() => setShowCreateModal(true)}>+ Add Trainer</Button>
                 </div>
 
                 <div className="card">
@@ -121,7 +119,14 @@ function TrainerManager() {
                             <tbody>
                                 {paginatedTrainers.map((trainer) => (
                                     <tr key={trainer._id}>
-                                        <td style={{ fontWeight: 600 }}>{trainer.name}</td>
+                                        <td>
+                                            <div className="flex items-center gap-3">
+                                                <div className="profile-avatar-sm" style={{ background: 'var(--accent-secondary)' }}>
+                                                    {trainer.name.charAt(0).toUpperCase()}
+                                                </div>
+                                                <strong>{trainer.name}</strong>
+                                            </div>
+                                        </td>
                                         <td className="text-secondary">{trainer.workEmail}</td>
                                         <td className="text-xs">{new Date(trainer.createdAt).toLocaleDateString()}</td>
                                         <td>
@@ -137,7 +142,7 @@ function TrainerManager() {
                 </div>
 
                 {totalPages > 1 && (
-                    <div className="flex justify-center mt-4 gap-2 items-center">
+                    <div className="pagination-container">
                         <Button
                             variant="secondary"
                             size="sm"
@@ -147,7 +152,7 @@ function TrainerManager() {
                             &larr; Prev
                         </Button>
                         <span className="text-muted" style={{ fontSize: '0.9rem' }}>
-                            Page <strong>{page}</strong> of {totalPages}
+                            Page <strong className="text-primary">{page}</strong> of {totalPages}
                         </span>
                         <Button
                             variant="secondary"

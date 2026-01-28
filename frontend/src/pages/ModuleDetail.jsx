@@ -67,7 +67,7 @@ function ModuleDetail() {
     const openAddDay = () => {
         setEditingItem(null);
         setFormData({
-            dayNumber: (module.days?.length || 0) + 1,
+
             date: '',
             topicName: '',
             topicDescription: '',
@@ -81,7 +81,7 @@ function ModuleDetail() {
     const openEditDay = (day, dayIdx) => {
         setEditingItem({ dayIdx, ...day });
         setFormData({
-            dayNumber: day.dayNumber,
+
             date: day.date ? new Date(day.date).toISOString().split('T')[0] : '',
             topicName: day.topicName || '',
             topicDescription: day.topicDescription || '',
@@ -153,7 +153,7 @@ function ModuleDetail() {
         const newModules = [...course.modules];
 
         const dayData = {
-            dayNumber: parseInt(formData.dayNumber),
+
             date: formData.date ? new Date(formData.date) : null,
             topicName: formData.topicName,
             topicDescription: formData.topicDescription,
@@ -275,7 +275,7 @@ function ModuleDetail() {
                         </div>
                     )}
 
-                    {filteredDays?.sort((a, b) => a.dayNumber - b.dayNumber).map((day, idx) => (
+                    {filteredDays?.map((day, idx) => (
                         <DayCard
                             key={idx}
                             day={day}
@@ -312,8 +312,7 @@ function ModuleDetail() {
                             <div className="glass-header flex flex-col md:flex-row justify-between items-start mb-8 pb-6 border-b border-white-10">
                                 <div className="flex items-start">
                                     <div className="day-status-badge">
-                                        <span className="day-label">Day</span>
-                                        <span className="day-num">{viewingDay.dayNumber}</span>
+                                        <span className="day-label">Topic</span>
                                     </div>
                                     <div>
                                         {viewingDay.date && <div className="text-xs font-bold text-secondary uppercase tracking-widest mb-1">{new Date(viewingDay.date).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</div>}
@@ -387,10 +386,6 @@ function ModuleDetail() {
                 <Modal isOpen={isConfigModalOpen} onClose={() => setIsConfigModalOpen(false)} title="Configure Day" size="xl">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="form-row">
-                            <div className="form-group mb-0">
-                                <label className="form-label">Day Number</label>
-                                <input type="number" className="form-input" value={formData.dayNumber} onChange={e => setFormData({ ...formData, dayNumber: e.target.value })} required />
-                            </div>
                             <div className="form-group mb-0">
                                 <label className="form-label">Date</label>
                                 <input type="date" className="form-input" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} />
@@ -481,8 +476,8 @@ const DayCard = ({ day, idx, onClick, onEdit, onDelete }) => {
                 <div className="day-card-main" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1.5rem' }}>
                     {/* Badge on the LEFT */}
                     <div className="day-badge" style={{ order: -1 }}>
-                        <span className="day-label">Day</span>
-                        <span className="day-number">{day.dayNumber}</span>
+                        <span className="day-label">Index</span>
+                        <span className="day-number">{idx + 1}</span>
                     </div>
 
                     {/* Info Text */}

@@ -24,45 +24,48 @@ function Sidebar({ onClose }) {
         <aside className="sidebar h-full">
             <div className="sidebar-header">
                 <h1 className="brand-title">Owl Coder</h1>
-                <p className="brand-subtitle">Hello, {adminName}</p>
             </div>
 
             <nav className="sidebar-nav">
                 <NavLink to="/admin" end className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={handleLinkClick}>
-                    {/* <span className="sidebar-icon"></span> */}
                     Dashboard
                 </NavLink>
 
                 <NavLink to="/admin/courses" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={handleLinkClick}>
-                    {/* <span className="sidebar-icon"></span> */}
                     Courses
                 </NavLink>
 
-                <NavLink to="/admin/batches" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={handleLinkClick}>
-                    {/* <span className="sidebar-icon"></span> */}
-                    Batches
+                <NavLink to="/admin/modules" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={handleLinkClick}>
+                    Modules
                 </NavLink>
 
-                <NavLink to="/admin/trainees" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={handleLinkClick}>
-                    {/* <span className="sidebar-icon"></span> */}
-                    Trainees
+                <NavLink to="/admin/topics" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={handleLinkClick}>
+                    Topics
                 </NavLink>
 
-                <NavLink to="/admin/trainers" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={handleLinkClick}>
-                    {/* <span className="sidebar-icon"></span> */}
-                    Trainers
+                <NavLink to="/admin/problems" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={handleLinkClick}>
+                    Problems
                 </NavLink>
 
                 <NavLink to="/admin/challenges" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={handleLinkClick}>
-                    {/* <span className="sidebar-icon"></span> */}
                     Challenges
+                </NavLink>
+
+                <NavLink to="/admin/trainers" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={handleLinkClick}>
+                    Trainers
+                </NavLink>
+
+                <NavLink to="/admin/trainees" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={handleLinkClick}>
+                    Trainees
+                </NavLink>
+
+                <NavLink to="/admin/batches" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`} onClick={handleLinkClick}>
+                    Batches
                 </NavLink>
             </nav>
 
             <div className="sidebar-footer">
-                <div style={{ marginBottom: '1rem' }}>
-                    <ThemeToggle />
-                </div>
+                <ThemeToggle />
                 <button onClick={handleLogout} className="logout-btn">
                     Logout
                 </button>

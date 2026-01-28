@@ -138,8 +138,9 @@ function AdminDashboard() {
                                         allowDecimals={false}
                                     />
                                     <Tooltip
+                                        cursor={{ fill: 'transparent' }}
                                         contentStyle={{
-                                            backgroundColor: 'var(--bg-surface)',
+                                            backgroundColor: 'var(--bg-card)',
                                             borderColor: 'var(--border-color)',
                                             color: 'var(--text-primary)'
                                         }}

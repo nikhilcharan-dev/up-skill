@@ -12,6 +12,11 @@ import ChallengeManager from './pages/ChallengeManager';
 import ChallengeRoadmap from './pages/ChallengeRoadmap';
 import TraineeDashboard from './pages/TraineeDashboard';
 import ModuleDetail from './pages/ModuleDetail';
+import ProblemLibrary from './pages/ProblemLibrary';
+import ModuleManager from './pages/ModuleManager';
+import ModuleContentEditor from './pages/ModuleContentEditor';
+import TopicManager from './pages/TopicManager';
+import TopicContentEditor from './pages/TopicContentEditor';
 import ThemeToggle from './components/ThemeToggle';
 import Notification from './components/Notification';
 
@@ -31,7 +36,12 @@ function App() {
                     <Route path="courses/:id/structure" element={<CourseStructureEditor />} />
                     <Route path="courses/:id/modules/:moduleIdx" element={<ModuleDetail />} />
                     <Route path="courses/:id/calendar" element={<CourseCalendar />} />
+                    <Route path="modules" element={<ModuleManager />} />
+                    <Route path="modules/:id/content" element={<ModuleContentEditor />} />
+                    <Route path="topics" element={<TopicManager />} />
+                    <Route path="topics/:id/content" element={<TopicContentEditor />} />
                     <Route path="challenges" element={<ChallengeManager />} />
+                    <Route path="problems" element={<ProblemLibrary />} />
                     <Route path="challenges/:id/roadmap" element={<ChallengeRoadmap />} />
                     <Route path="batches" element={<BatchManager />} />
                     <Route path="trainees" element={<TraineeList />} />

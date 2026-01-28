@@ -11,12 +11,10 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: {
-        folder: 'owl-code-notes',
-        resource_type: 'raw', // Force RAW storage to prevent PDF corruption
-        // allowed_formats: ['pdf', 'doc', 'docx', 'ppt', 'pptx'], // Optional: Restrict if needed
-        public_id: (req, file) => `note-${Date.now()}-${file.originalname}`
-    },
+    public_id: (req, file) => {
+        const name = file.originalname.split('.').slice(0, -1).join('.');
+        return `note-${Date.now()}-${name}`;
+    }
 });
 
 export { cloudinary, storage };

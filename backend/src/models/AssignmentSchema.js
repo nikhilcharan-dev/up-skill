@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 export const AssignmentSchema = new mongoose.Schema({
+    problemId: { type: mongoose.Schema.Types.ObjectId, ref: 'Problem' }, // Link to Problem Library
     name: { type: String, required: true }, // Problem Name
     link: { type: String }, // Problem Link
     source: {

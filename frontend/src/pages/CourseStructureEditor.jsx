@@ -4,6 +4,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Button from '../components/Button';
 import Modal from '../components/Modal';
+import ModuleTopicScheduler from '../components/ModuleTopicScheduler';
+import CourseScheduleCalendar from '../components/CourseScheduleCalendar';
 import { showToast } from '../components/Notification';
 
 function CourseStructureEditor() {
@@ -11,14 +13,17 @@ function CourseStructureEditor() {
     const navigate = useNavigate();
     const [course, setCourse] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [availableModules, setAvailableModules] = useState([]); // All modules from library
+    const [showCalendar, setShowCalendar] = useState(false); // Toggle for calendar view
 
     // Modal State
-    const [modalType, setModalType] = useState(null); // 'module'
-    const [editingItem, setEditingItem] = useState(null);
+    const [modalType, setModalType] = useState(null); // 'selectModule' or 'schedule'
     const [formData, setFormData] = useState({});
+    const [selectedModuleForScheduling, setSelectedModuleForScheduling] = useState(null); // For scheduler modal
 
     useEffect(() => {
         fetchCourse();
+        fetchAvailableModules();
     }, [id]);
 
     const fetchCourse = async () => {
@@ -32,9 +37,18 @@ function CourseStructureEditor() {
         }
     };
 
-    const handleSaveStructure = async (newModules) => {
+    const fetchAvailableModules = async () => {
         try {
-            const response = await api.put(`/admin/course/${id}/content`, { modules: newModules });
+            const response = await api.get('/modules');
+            setAvailableModules(response.data);
+        } catch (err) {
+            showToast('Failed to load modules library', 'error');
+        }
+    };
+
+    const handleSaveStructure = async (newModuleIds) => {
+        try {
+            const response = await api.put(`/admin/course/${id}/content`, { modules: newModuleIds });
             setCourse(response.data);
             showToast('Changes saved successfully', 'success');
             setModalType(null);
@@ -46,164 +60,251 @@ function CourseStructureEditor() {
     // --- Action Handlers ---
 
     const openAddModule = () => {
-        setEditingItem(null);
-        setFormData({ title: '', description: '' });
-        setModalType('module');
+        setFormData({ selectedModuleId: '' });
+        setModalType('selectModule');
     };
 
-    const openEditModule = (e, module, idx) => {
+    const unlinkModule = (e, idx) => {
         e.stopPropagation();
-        setEditingItem({ ...module, idx });
-        setFormData({ title: module.title, description: module.description });
-        setModalType('module');
-    };
-
-    const deleteModule = (e, idx) => {
-        e.stopPropagation();
-        if (!window.confirm('Delete this module and all its contents?')) return;
-        const newModules = [...course.modules];
-        newModules.splice(idx, 1);
-        handleSaveStructure(newModules);
-    };
-
-    const toggleLockModule = (e, idx) => {
-        e.stopPropagation();
-        const newModules = [...course.modules];
-        newModules[idx].isLocked = !newModules[idx].isLocked;
-        handleSaveStructure(newModules);
+        if (!window.confirm('Remove this module from the course?')) return;
+        const newModuleIds = course.modules.map(m => m._id);
+        newModuleIds.splice(idx, 1);
+        handleSaveStructure(newModuleIds);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const newModules = [...(course.modules || [])];
 
-        if (modalType === 'module') {
-            const moduleData = {
-                title: formData.title,
-                description: formData.description,
-                days: editingItem?.idx !== undefined ? newModules[editingItem.idx].days : []
-            };
-
-            if (editingItem && editingItem.idx !== undefined) {
-                newModules[editingItem.idx] = moduleData;
-            } else {
-                newModules.push(moduleData);
-            }
+        if (modalType === 'selectModule' && formData.selectedModuleId) {
+            // Find the selected module and open scheduler
+            const selectedModule = availableModules.find(m => m._id === formData.selectedModuleId);
+            setSelectedModuleForScheduling(selectedModule);
+            setModalType('schedule'); // Switch to scheduler modal
         }
-        handleSaveStructure(newModules);
     };
 
-    if (loading) return <div className="page p-5">Loading...</div>;
-    if (!course) return <div className="page p-5">Course not found</div>;
+    const handleScheduleSave = (topicSchedules) => {
+        // topicSchedules is array of { topicId, date }
+        if (!selectedModuleForScheduling) return;
+
+        const moduleId = selectedModuleForScheduling._id;
+        const newSchedule = [...(course.moduleSchedule || [])];
+
+        // Remove existing schedule for this module if any
+        const existingIdx = newSchedule.findIndex(s => s.moduleId.toString() === moduleId.toString());
+
+        const moduleScheduleEntry = {
+            moduleId: moduleId,
+            topicSchedules: topicSchedules
+        };
+
+        if (existingIdx !== -1) {
+            newSchedule[existingIdx] = moduleScheduleEntry;
+        } else {
+            newSchedule.push(moduleScheduleEntry);
+        }
+
+        // Save schedule (module is already in course)
+        saveCourseStructure(course.modules.map(m => m._id), newSchedule);
+    };
+
+    const saveCourseStructure = async (moduleIds, moduleSchedule) => {
+        try {
+            const response = await api.put(`/admin/course/${id}/content`, {
+                modules: moduleIds,
+                moduleSchedule: moduleSchedule
+            });
+            setCourse(response.data);
+            showToast('Module added and scheduled successfully', 'success');
+            setModalType(null);
+            setSelectedModuleForScheduling(null);
+        } catch (err) {
+            showToast('Failed to save changes', 'error');
+        }
+    };
+
+    if (loading) return <div className="page p-8 flex items-center justify-center text-muted">Loading Course...</div>;
+    if (!course) return <div className="page p-8 text-center text-red-500">Course not found</div>;
 
     return (
         <div className="page course-structure-editor">
             <div className="container">
-                <nav className="nav mb-4">
+                <nav className="nav">
                     <Link to="/admin/courses" className="nav-link">← Back to Courses</Link>
                 </nav>
 
                 <div className="flex justify-between items-center mb-8">
                     <div>
-                        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                            {course.title} Modules
+                        <h1 className="text-3xl font-bold text-gradient mb-2">
+                            {course.title}
                         </h1>
-                        <p className="text-muted">Select a module to view its curriculum.</p>
+                        <p className="text-muted">Manage modules and schedule for this course.</p>
                     </div>
-                    <Button onClick={openAddModule} variant="primary">+ Add Module</Button>
+                    <div className="flex items-center gap-4">
+                        {/* View Toggle */}
+                        <div className="view-toggle-container">
+                            <button
+                                onClick={() => setShowCalendar(false)}
+                                className={`view-toggle-btn ${!showCalendar ? 'active active-modules' : ''}`}
+                            >
+                                <span className="mr-2"></span> Modules
+                            </button>
+                            <button
+                                onClick={() => setShowCalendar(true)}
+                                className={`view-toggle-btn ${showCalendar ? 'active active-calendar' : ''}`}
+                            >
+                                <span className="mr-2"></span> Calendar
+                            </button>
+                        </div>
+                        {!showCalendar && (
+                            <Button onClick={openAddModule} variant="primary">+ Add Module</Button>
+                        )}
+                    </div>
                 </div>
 
-                <div className="structure-content">
-                    {course.modules?.length === 0 && (
-                        <div className="text-center p-8 border border-dashed border-white-10 rounded-lg">
-                            <p className="text-muted mb-4">No modules yet.</p>
-                            <Button onClick={openAddModule}>Create First Module</Button>
-                        </div>
-                    )}
+                {/* Calendar View */}
+                {showCalendar && (
+                    <div className="mb-8 animate">
+                        <CourseScheduleCalendar course={course} />
+                    </div>
+                )}
 
-                    <div className="modules-list grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {course.modules?.map((module, mIdx) => (
-                            <div
-                                key={mIdx}
-                                className="card module-card bg-white-5 border border-white-10 hover:border-blue-500/50 hover:bg-white-10 transition-all duration-300 relative group p-5 rounded-xl flex flex-col h-full"
-                                onClick={() => navigate(`/admin/courses/${id}/modules/${mIdx}`)}
-                            >
-                                <div className="flex justify-between items-start mb-3">
-                                    <div className="px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-xs text-blue-400 font-bold uppercase tracking-wider">Module {mIdx + 1}</div>
-                                    <div className="action-group">
-                                        {/* Lock Toggle Switch */}
-                                        <div
-                                            className="lock-toggle-container"
-                                            onClick={(e) => toggleLockModule(e, mIdx)}
-                                            title={module.isLocked ? "Currently Locked" : "Currently Unlocked"}
-                                        >
-                                            <span className={`lock-label ${module.isLocked ? 'locked' : 'unlocked'}`}>
-                                                {module.isLocked ? 'LOCKED' : 'UNLOCKED'}
-                                            </span>
-                                            <div className={`toggle-switch ${module.isLocked ? 'locked' : 'unlocked'}`}>
-                                                <div className="toggle-thumb"></div>
+                {!showCalendar && (
+                    <div className="structure-content animate">
+                        {course.modules?.length === 0 && (
+                            <div className="text-center p-12 border-2 border-dashed border-white-5 rounded-xl bg-glass">
+                                <span className="text-4xl block mb-4 opacity-50">Folder Empty</span>
+                                <p className="text-muted mb-6">No modules added yet.</p>
+                                <Button onClick={openAddModule} variant="primary">Add Module from Library</Button>
+                            </div>
+                        )}
+
+                        <div className="structure-grid">
+                            {course.modules?.map((module, mIdx) => {
+                                // Get schedule info for this module
+                                const moduleSchedule = course.moduleSchedule?.find(
+                                    s => s.moduleId.toString() === module._id.toString()
+                                );
+                                const scheduledTopicsCount = moduleSchedule?.topicSchedules?.filter(ts => ts.date).length || 0;
+                                const totalTopics = module.topics?.length || 0;
+                                const totalProblems = module.topics?.reduce((acc, t) => acc + (t.assignmentProblems?.length || 0) + (t.practiceProblems?.length || 0), 0) || 0;
+
+                                return (
+                                    <div
+                                        key={module._id}
+                                        className="module-structure-card group"
+                                        onClick={() => navigate(`/admin/modules/${module._id}/content`)}
+                                    >
+                                        <div className="card-header">
+                                            <div className="module-index-badge">Module {mIdx + 1}</div>
+                                            <div className="card-actions">
+                                                <Button
+                                                    size="sm"
+                                                    variant="secondary"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedModuleForScheduling(module);
+                                                        setModalType('schedule');
+                                                    }}
+                                                    className="py-1 px-2 text-xs"
+                                                >
+                                                    Schedule
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="danger"
+                                                    onClick={(e) => unlinkModule(e, mIdx)}
+                                                    className="py-1 px-2 text-xs"
+                                                >
+                                                    Remove
+                                                </Button>
                                             </div>
                                         </div>
 
-                                        <div className="h-4 w-px bg-white/10 mx-1"></div>
+                                        <h3 className="module-title group-hover:text-blue-400 transition-colors">{module.title}</h3>
+                                        <p className="module-desc">{module.description || 'No description provided.'}</p>
 
-                                        <div className="button-group">
-                                            <Button size="sm" variant="secondary" onClick={(e) => openEditModule(e, module, mIdx)} style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>Edit</Button>
-                                            <Button size="sm" variant="danger" onClick={(e) => deleteModule(e, mIdx)} style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>Delete</Button>
+                                        <div className="card-footer">
+                                            <div className="meta-stats">
+                                                <span className="stat-item">
+                                                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                                                    {totalTopics} Topics
+                                                </span>
+                                                <span className="stat-item">
+                                                    <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                                                    {totalProblems} Problems
+                                                </span>
+                                            </div>
+
+                                            {totalTopics > 0 && (
+                                                <div className="schedule-status">
+                                                    <span className={`status-text ${scheduledTopicsCount === totalTopics ? 'complete' : scheduledTopicsCount > 0 ? 'partial' : 'none'}`}>
+                                                        {scheduledTopicsCount === totalTopics ? 'Fully Scheduled' : scheduledTopicsCount > 0 ? 'Partially Scheduled' : 'Not Scheduled'}
+                                                    </span>
+                                                    <span className="text-muted ml-auto text-xs">
+                                                        {scheduledTopicsCount}/{totalTopics}
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                </div>
-
-                                <div className="flex items-center gap-2 mb-2">
-                                    <h3 className="text-xl font-bold text-white group-hover:text-blue-200 transition-colors">{module.title}</h3>
-                                    {module.isLocked && <span className="text-xs text-red-400 border border-red-500/30 bg-red-500/10 px-1.5 py-0.5 rounded">Locked</span>}
-                                </div>
-                                <p className="text-muted text-sm line-clamp-3 mb-6 flex-grow">{module.description || 'No description provided.'}</p>
-
-                                <div className="mt-auto border-t border-white-5 pt-4 flex justify-between text-xs font-mono text-muted">
-                                    <span className="flex items-center gap-1">
-                                        <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                                        {module.days?.length || 0} Days
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                        <span className="w-2 h-2 rounded-full bg-purple-500"></span>
-                                        {module.days?.reduce((acc, d) => acc + (d.assignments?.length || 0), 0) || 0} Assignments
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
+                )}
 
-                {/* --- MODAL --- */}
-                <Modal isOpen={modalType === 'module'} onClose={() => setModalType(null)} title={editingItem?.idx !== undefined ? 'Edit Module' : 'Add Module'}>
+                {/* --- SELECT MODULE MODAL --- */}
+                <Modal isOpen={modalType === 'selectModule'} onClose={() => setModalType(null)} title="Add Module to Course">
                     <form onSubmit={handleSubmit} className="p-1">
                         <div className="form-group">
-                            <label className="form-label">Title</label>
-                            <input
+                            <label className="form-label">Select Module from Library</label>
+                            <select
                                 className="form-input"
-                                value={formData.title || ''}
-                                onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                placeholder="Module Title"
+                                value={formData.selectedModuleId || ''}
+                                onChange={e => setFormData({ ...formData, selectedModuleId: e.target.value })}
                                 required
                                 autoFocus
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Description</label>
-                            <textarea
-                                className="form-input"
-                                rows={3}
-                                value={formData.description || ''}
-                                onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                placeholder="Briefly describe this module..."
-                            />
+                            >
+                                <option value="">-- Select a Module --</option>
+                                {availableModules
+                                    .filter(m => !course.modules?.some(cm => cm._id === m._id))
+                                    .map(module => (
+                                        <option key={module._id} value={module._id}>
+                                            {module.title} ({module.topics?.length || 0} topics)
+                                        </option>
+                                    ))}
+                            </select>
+                            <p className="text-xs text-muted mt-2">Modules are managed in the Modules Library. Go to Modules → Edit Content to add days/topics.</p>
                         </div>
                         <div className="flex justify-end gap-3 mt-6">
                             <Button variant="secondary" onClick={() => setModalType(null)}>Cancel</Button>
-                            <Button type="submit">Save Module</Button>
+                            <Button type="submit" variant="primary">Add Module</Button>
                         </div>
                     </form>
+                </Modal>
+
+                {/* --- MODULE TOPIC SCHEDULER MODAL --- */}
+                <Modal
+                    isOpen={modalType === 'schedule'}
+                    onClose={() => {
+                        setModalType(null);
+                        setSelectedModuleForScheduling(null);
+                    }}
+                    title={`Schedule: ${selectedModuleForScheduling?.title || 'Module'}`}
+                    size="lg"
+                >
+                    {selectedModuleForScheduling && (
+                        <ModuleTopicScheduler
+                            course={course}
+                            module={selectedModuleForScheduling}
+                            onSave={handleScheduleSave}
+                            onClose={() => {
+                                setModalType(null);
+                                setSelectedModuleForScheduling(null);
+                            }}
+                        />
+                    )}
                 </Modal>
             </div>
         </div>
@@ -211,3 +312,4 @@ function CourseStructureEditor() {
 }
 
 export default CourseStructureEditor;
+

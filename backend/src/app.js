@@ -7,6 +7,9 @@ import authRoutes from './routes/auth.js';
 import adminRoutes from './routes/admin.js';
 import traineeRoutes from './routes/trainee.js';
 import challengeRoutes from './routes/challenge.js';
+import moduleRoutes from './routes/module.js';
+import topicRoutes from './routes/topic.js';
+import problemRoutes from './routes/problems.js';
 import { verifyToken } from './middlewares/auth.js';
 import path from 'path';
 
@@ -26,6 +29,9 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', verifyToken, adminRoutes);
+app.use('/api/modules', verifyToken, moduleRoutes);
+app.use('/api/topics', verifyToken, topicRoutes);
+app.use('/api/problems', verifyToken, problemRoutes);
 app.use('/api/trainee', verifyToken, traineeRoutes);
 app.use('/api/challenges', verifyToken, challengeRoutes);
 

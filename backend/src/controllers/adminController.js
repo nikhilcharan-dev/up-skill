@@ -83,28 +83,79 @@ export const deleteCourse = async (req, res) => {
 // Get course by ID
 export const getCourseById = async (req, res) => {
     try {
-        const course = await Course.findById(req.params.id);
+        const course = await Course.findById(req.params.id).populate({
+            path: 'modules',
+            populate: {
+                path: 'topics'
+            }
+        });
         if (!course) return res.status(404).json({ msg: 'Course not found' });
+
         res.json(course);
     } catch (err) {
+        console.error('[getCourseById] Error:', err);
         res.status(500).json({ msg: err.message });
     }
 };
 
 // Update course assignments for a specific day
-// Update course content (Structure: Modules -> Topics -> Days)
+// Update course content (module references and scheduling)
 export const updateCourseContent = async (req, res) => {
     try {
-        const { modules } = req.body;
-        console.log(`[updateCourseContent] Updating content for ${req.params.id}. Modules received: ${modules?.length}`);
+        const { modules, moduleSchedule } = req.body; // Array of Module IDs + schedule
+        console.log(`[updateCourseContent] Updating content for ${req.params.id}. Modules: ${modules?.length}, Schedule entries: ${moduleSchedule?.length}`);
 
         const course = await Course.findById(req.params.id);
         if (!course) return res.status(404).json({ msg: 'Course not found' });
 
-        course.modules = modules;
+        // Validate topic schedule dates are within course date range and unique
+        if (moduleSchedule && moduleSchedule.length > 0) {
+            const courseStart = new Date(course.startDate);
+            const courseEnd = new Date(course.endDate);
+            const dateMap = new Map(); // Track dates to ensure uniqueness
+
+            for (const moduleEntry of moduleSchedule) {
+                if (moduleEntry.topicSchedules) {
+                    for (const topicSchedule of moduleEntry.topicSchedules) {
+                        if (topicSchedule.date) {
+                            const topicDate = new Date(topicSchedule.date);
+                            const dateKey = topicSchedule.date; // Use ISO string as key
+
+                            // Check date range
+                            if (topicDate < courseStart || topicDate > courseEnd) {
+                                return res.status(400).json({
+                                    msg: `Topic date ${topicDate.toDateString()} is outside course date range (${courseStart.toDateString()} - ${courseEnd.toDateString()})`
+                                });
+                            }
+
+                            // Check for duplicate dates
+                            if (dateMap.has(dateKey)) {
+                                return res.status(400).json({
+                                    msg: `Multiple topics cannot be assigned to the same date: ${topicDate.toDateString()}`
+                                });
+                            }
+                            dateMap.set(dateKey, topicSchedule.topicId);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (modules) course.modules = modules;
+        if (moduleSchedule) course.moduleSchedule = moduleSchedule;
+
         await course.save();
         console.log(`[updateCourseContent] Success.`);
-        res.json(course);
+
+        // Return populated data with topics
+        const populated = await Course.findById(req.params.id).populate({
+            path: 'modules',
+            populate: {
+                path: 'topics'
+            }
+        });
+
+        res.json(populated);
     } catch (err) {
         console.error('[updateCourseContent] Error:', err);
         if (err.name === 'ValidationError') {
@@ -117,7 +168,12 @@ export const updateCourseContent = async (req, res) => {
 // Get all courses
 export const getCourses = async (req, res) => {
     try {
-        const courses = await Course.find();
+        const courses = await Course.find().populate({
+            path: 'modules',
+            populate: {
+                path: 'topics'
+            }
+        });
         res.json(courses);
     } catch (err) {
         res.status(500).json({ msg: err.message });

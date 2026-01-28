@@ -5,7 +5,7 @@ import Button from '../components/Button';
 import Modal from '../components/Modal';
 import TraineeProfileModal from '../components/TraineeProfileModal';
 import { showToast } from '../components/Notification';
-import '../styles/BatchManager.css';
+import '../styles/TraineeList.css'; // Reusing premium styles
 
 function BatchManager() {
     const [batches, setBatches] = useState([]);
@@ -21,6 +21,7 @@ function BatchManager() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [trainerSearch, setTrainerSearch] = useState('');
     const [showTrainerResults, setShowTrainerResults] = useState(false);
+    const [searchTerm, setSearchTerm] = useState(''); // Added search state
 
     // View Trainees Modal State
     const [showViewTraineesModal, setShowViewTraineesModal] = useState(false);
@@ -64,6 +65,12 @@ function BatchManager() {
             setLoading(false);
         }
     };
+
+    // Filtered Batches
+    const filteredBatches = batches.filter(batch =>
+        batch.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        batch.course?.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const handleOpenEditModal = (batch) => {
         setIsEditing(true);
@@ -187,16 +194,28 @@ function BatchManager() {
     return (
         <div className="page">
             <div className="container">
-                {/* Navbar removed - moved to Sidebar */}
-
-                <div className="page-header">
-                    <h1>Batch Management</h1>
-                    <Button variant="primary" onClick={handleOpenCreateModal}>+ Add Batch</Button>
+                <div className="page-header page-header-column">
+                    <div>
+                        <h1>Batch Management</h1>
+                        <p className="text-secondary">Organize, schedule, and manage trainee batches</p>
+                    </div>
+                    <div className="flex justify-between items-center w-full">
+                        <div className="search-container">
+                            <input
+                                type="text"
+                                className="form-input search-input"
+                                placeholder="Search by batch name or course..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <Button variant="primary" onClick={handleOpenCreateModal}>+ Add Batch</Button>
+                    </div>
                 </div>
 
                 <div className="card">
-                    {batches.length === 0 ? (
-                        <p className="text-muted text-center">No batches found.</p>
+                    {filteredBatches.length === 0 ? (
+                        <p className="text-muted text-center p-8">No batches found matching your search.</p>
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="table min-w-full">
@@ -210,14 +229,25 @@ function BatchManager() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {batches.map((batch) => (
+                                    {filteredBatches.map((batch) => (
                                         <tr key={batch._id}>
-                                            <td><strong>{batch.name}</strong></td>
-                                            <td>{batch.course?.title || 'Unknown'}</td>
-                                            <td className="batch-date">
-                                                {new Date(batch.startDate).toLocaleDateString()} - {new Date(batch.endDate).toLocaleDateString()}
+                                            <td>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="profile-avatar-sm" style={{ background: 'var(--accent-primary)', fontSize: '0.7rem' }}>
+                                                        {batch.name.substring(0, 2).toUpperCase()}
+                                                    </div>
+                                                    <strong>{batch.name}</strong>
+                                                </div>
                                             </td>
-                                            <td><span className="text-secondary">{batch.trainees?.length || 0} Trainees</span></td>
+                                            <td><span className="text-secondary">{batch.course?.title || 'Unknown'}</span></td>
+                                            <td className="batch-date">
+                                                <div className="text-xs text-muted">
+                                                    {new Date(batch.startDate).toLocaleDateString()} &rarr; {new Date(batch.endDate).toLocaleDateString()}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span className="tag-tiny bg-glass">{batch.trainees?.length || 0} Trainees</span>
+                                            </td>
                                             <td>
                                                 <div className="flex gap-2">
                                                     <Button variant="secondary" size="sm" onClick={() => handleOpenEditModal(batch)}>
@@ -455,11 +485,11 @@ function ViewTraineesModal({ batch, isOpen, onClose }) {
                             </div>
 
                             {totalPages > 1 && (
-                                <div className="flex justify-center gap-2 items-center mt-2">
+                                <div className="pagination-container">
                                     <Button size="sm" variant="secondary" disabled={page === 1} onClick={() => setPage(p => p - 1)}>
                                         &larr; Prev
                                     </Button>
-                                    <span className="text-sm">Page {page} of {totalPages}</span>
+                                    <span className="text-sm">Page <strong className="text-primary">{page}</strong> of {totalPages}</span>
                                     <Button size="sm" variant="secondary" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}>
                                         Next &rarr;
                                     </Button>

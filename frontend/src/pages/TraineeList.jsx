@@ -151,7 +151,7 @@ function TraineeList() {
                 </div>
 
                 {totalPages > 1 && (
-                    <div className="flex justify-center mt-4 gap-2 items-center">
+                    <div className="pagination-container">
                         <Button
                             variant="secondary"
                             size="sm"
@@ -161,7 +161,7 @@ function TraineeList() {
                             &larr; Prev
                         </Button>
                         <span className="text-muted" style={{ fontSize: '0.9rem' }}>
-                            Page <strong>{page}</strong> of {totalPages}
+                            Page <strong className="text-primary">{page}</strong> of {totalPages}
                         </span>
                         <Button
                             variant="secondary"

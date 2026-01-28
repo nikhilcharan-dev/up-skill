@@ -60,15 +60,7 @@
     border-color: var(--accent-primary);
 }
 
-.day-card.active::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: var(--accent-primary);
-}
+
 
 .day-card.empty {
     border-style: dashed;

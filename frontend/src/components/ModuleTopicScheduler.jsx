@@ -5,7 +5,12 @@ import '../styles/ModuleTopicScheduler.css';
 
 function ModuleTopicScheduler({ course, module, onSave, onClose }) {
     const [topicSchedules, setTopicSchedules] = useState([]);
+    const [testLink, setTestLink] = useState('');
     const [loading, setLoading] = useState(true);
+    const [showManualAssignModal, setShowManualAssignModal] = useState(false);
+    const [showAutoAssignModal, setShowAutoAssignModal] = useState(false);
+    const [autoAssignStartTopic, setAutoAssignStartTopic] = useState(null);
+    const [autoAssignStartDate, setAutoAssignStartDate] = useState('');
 
     useEffect(() => {
         initializeSchedules();
@@ -21,6 +26,9 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
         const existingSchedule = course.moduleSchedule?.find(
             s => s.moduleId.toString() === module._id.toString()
         );
+
+        // Initialize test link from existing schedule
+        setTestLink(existingSchedule?.testLink || '');
 
         // Initialize schedule for each topic
         const schedules = module.topics.map(topic => {
@@ -146,11 +154,93 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
                 date: ts.date
             }));
 
-        onSave(schedulesToSave);
+        onSave(schedulesToSave, testLink);
     };
 
     const clearAllDates = () => {
         setTopicSchedules(prev => prev.map(ts => ({ ...ts, date: '' })));
+    };
+
+    const handleAutoAssign = () => {
+        if (!autoAssignStartTopic || !autoAssignStartDate) {
+            showToast('Please select a topic and date', 'error');
+            return;
+        }
+
+        const courseEnd = new Date(course.endDate);
+        const excludedDays = course.excludedDays || [0];
+        const holidays = (course.customHolidays || []).map(h => new Date(h).toISOString().split('T')[0]);
+
+        let currentDate = new Date(autoAssignStartDate);
+        const updatedSchedules = [...topicSchedules];
+
+        // Find the starting topic index
+        const startIndex = updatedSchedules.findIndex(ts => ts.topicId === autoAssignStartTopic);
+
+        if (startIndex === -1) return;
+
+        // Assign dates starting from the selected topic
+        for (let i = startIndex; i < updatedSchedules.length; i++) {
+            // Skip to next valid date
+            while (
+                currentDate <= courseEnd &&
+                (excludedDays.includes(currentDate.getDay()) ||
+                    holidays.includes(currentDate.toISOString().split('T')[0]))
+            ) {
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            if (currentDate > courseEnd) {
+                showToast('Not enough valid dates for all topics', 'warning');
+                break;
+            }
+
+            updatedSchedules[i].date = currentDate.toISOString().split('T')[0];
+
+            // Move to next day
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        setTopicSchedules(updatedSchedules);
+        setShowAutoAssignModal(false);
+        setAutoAssignStartTopic(null);
+        setAutoAssignStartDate('');
+        showToast('Dates auto-assigned successfully', 'success');
+    };
+
+    const handleBulkAssign = (startDate) => {
+        const courseStart = new Date(course.startDate);
+        const courseEnd = new Date(course.endDate);
+        const excludedDays = course.excludedDays || [0]; // Default: skip Sundays
+        const holidays = (course.customHolidays || []).map(h => new Date(h).toISOString().split('T')[0]);
+
+        let currentDate = new Date(startDate);
+        const updatedSchedules = [...topicSchedules];
+
+        for (let i = 0; i < updatedSchedules.length; i++) {
+            // Skip to next valid date
+            while (
+                currentDate <= courseEnd &&
+                (excludedDays.includes(currentDate.getDay()) ||
+                    holidays.includes(currentDate.toISOString().split('T')[0]))
+            ) {
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            if (currentDate > courseEnd) {
+                showToast('Not enough valid dates in course range', 'error');
+                break;
+            }
+
+            updatedSchedules[i].date = currentDate.toISOString().split('T')[0];
+
+            // Move to next day
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        setTopicSchedules(updatedSchedules);
+        setShowBulkAssignModal(false);
+        showToast('Dates assigned successfully', 'success');
     };
 
     if (loading) {
@@ -205,20 +295,53 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
                     </button>
                 </div>
 
-                {/* Course Date Range Info */}
-                <div className="date-range-info">
-                    <div className="info-icon">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
+                {/* Date Range and Test Link - Side by Side */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+                    {/* Course Date Range Info */}
+                    <div className="date-range-info" style={{ marginTop: 0 }}>
+                        <div className="info-icon">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div className="flex-1">
+                            <p className="info-label">Course Date Range</p>
+                            <p className="info-value">
+                                {new Date(course.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                <span>→</span>
+                                {new Date(course.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </p>
+                        </div>
                     </div>
-                    <div className="flex-1">
-                        <p className="info-label">Course Date Range</p>
-                        <p className="info-value">
-                            {new Date(course.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                            <span>→</span>
-                            {new Date(course.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </p>
+
+                    {/* Test Link Input */}
+                    <div className="date-range-info" style={{ marginTop: 0 }}>
+                        <div className="info-icon">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                            </svg>
+                        </div>
+                        <div className="flex-1">
+                            <label htmlFor="testLink" className="info-label">Module Test Link (Optional)</label>
+                            <input
+                                id="testLink"
+                                type="url"
+                                className="form-input mt-1"
+                                value={testLink}
+                                onChange={(e) => setTestLink(e.target.value)}
+                                placeholder="https://unstop.com/test/..."
+                                style={{
+                                    width: '100%',
+                                    padding: '8px 12px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                    borderRadius: '8px',
+                                    color: 'var(--text-primary)',
+                                    fontSize: '14px'
+                                }}
+                            />
+                            <p className="text-xs text-muted mt-1" style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px' }}>Unstop link for module test/assessment</p>
+                        </div>
                     </div>
                 </div>
 
@@ -237,8 +360,85 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
                 </div>
             </div>
 
-            {/* Topics List */}
-            <div className="scheduler-body">
+            {/* Action Buttons Area */}
+            <div className="scheduler-body" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.5rem' }}>
+                <div style={{ textAlign: 'center', maxWidth: '400px' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
+                        How would you like to assign dates?
+                    </h3>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                        Choose manual assignment for full control, or auto-assign for quick sequential scheduling.
+                    </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    <button
+                        onClick={() => setShowManualAssignModal(true)}
+                        style={{
+                            padding: '1rem 2rem',
+                            borderRadius: '10px',
+                            border: '2px solid var(--accent-primary)',
+                            background: 'rgba(59, 130, 246, 0.1)',
+                            color: 'var(--accent-primary)',
+                            cursor: 'pointer',
+                            fontWeight: 600,
+                            fontSize: '0.95rem',
+                            transition: 'all 0.2s',
+                            minWidth: '160px'
+                        }}
+                        onMouseOver={(e) => {
+                            e.target.style.background = 'var(--accent-primary)';
+                            e.target.style.color = 'white';
+                        }}
+                        onMouseOut={(e) => {
+                            e.target.style.background = 'rgba(59, 130, 246, 0.1)';
+                            e.target.style.color = 'var(--accent-primary)';
+                        }}
+                    >
+                        📝 Assign Manually
+                    </button>
+
+                    <button
+                        onClick={() => setShowAutoAssignModal(true)}
+                        style={{
+                            padding: '1rem 2rem',
+                            borderRadius: '10px',
+                            border: '2px solid var(--accent-secondary)',
+                            background: 'rgba(139, 92, 246, 0.1)',
+                            color: 'var(--accent-secondary)',
+                            cursor: 'pointer',
+                            fontWeight: 600,
+                            fontSize: '0.95rem',
+                            transition: 'all 0.2s',
+                            minWidth: '160px'
+                        }}
+                        onMouseOver={(e) => {
+                            e.target.style.background = 'var(--accent-secondary)';
+                            e.target.style.color = 'white';
+                        }}
+                        onMouseOut={(e) => {
+                            e.target.style.background = 'rgba(139, 92, 246, 0.1)';
+                            e.target.style.color = 'var(--accent-secondary)';
+                        }}
+                    >
+                        ⚡ Auto Assign
+                    </button>
+                </div>
+
+                <div style={{ marginTop: '1rem' }}>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center' }}>
+                        <div style={{ marginBottom: '0.5rem' }}>
+                            <strong>Manual:</strong> Assign dates to each topic individually
+                        </div>
+                        <div>
+                            <strong>Auto:</strong> Select a starting topic and date, auto-assign the rest
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* HIDDEN - Old Topics List (kept for reference but not rendered) */}
+            <div style={{ display: 'none' }} className="scheduler-body">
                 <div className="topics-list">
                     {topicSchedules.map((schedule, index) => {
                         const dayNum = schedule.date ? globalDayMap.get(new Date(schedule.date).toISOString().split('T')[0]) : null;
@@ -333,6 +533,248 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
                     </Button>
                 </div>
             </div>
+
+            {/* Manual Assignment Modal */}
+            {showManualAssignModal && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 10000
+                    }}
+                    onClick={() => setShowManualAssignModal(false)}
+                >
+                    <div
+                        style={{
+                            background: 'var(--bg-card)',
+                            borderRadius: '12px',
+                            padding: '1.5rem',
+                            maxWidth: '700px',
+                            width: '90%',
+                            maxHeight: '80vh',
+                            overflow: 'auto',
+                            border: '1px solid var(--border-color)',
+                            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                            <div>
+                                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+                                    Assign Dates Manually
+                                </h3>
+                                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                                    Assign a date to each topic individually.
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setShowManualAssignModal(false)}
+                                style={{
+                                    background: 'transparent',
+                                    border: 'none',
+                                    color: 'var(--text-muted)',
+                                    cursor: 'pointer',
+                                    fontSize: '1.5rem',
+                                    padding: '0.25rem'
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {topicSchedules.map((schedule, index) => {
+                                const dayNum = schedule.date ? globalDayMap.get(new Date(schedule.date).toISOString().split('T')[0]) : null;
+                                return (
+                                    <div
+                                        key={schedule.topicId}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '1rem',
+                                            padding: '1rem',
+                                            background: 'var(--bg-secondary)',
+                                            borderRadius: '8px',
+                                            border: '1px solid var(--border-color)'
+                                        }}
+                                    >
+                                        <div style={{ minWidth: '50px', textAlign: 'center' }}>
+                                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '2px' }}>Day</div>
+                                            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: dayNum ? 'var(--accent-primary)' : 'var(--text-muted)' }}>
+                                                {dayNum || '-'}
+                                            </div>
+                                        </div>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{schedule.topicName}</div>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                                {schedule.assignmentCount} problems
+                                            </div>
+                                        </div>
+                                        <input
+                                            type="date"
+                                            value={schedule.date ? new Date(schedule.date).toISOString().split('T')[0] : ''}
+                                            onChange={(e) => handleDateChange(schedule.topicId, e.target.value)}
+                                            min={new Date(course.startDate).toISOString().split('T')[0]}
+                                            max={new Date(course.endDate).toISOString().split('T')[0]}
+                                            style={{
+                                                padding: '0.5rem',
+                                                borderRadius: '6px',
+                                                border: '1px solid var(--border-color)',
+                                                background: 'var(--input-bg)',
+                                                color: 'var(--text-primary)'
+                                            }}
+                                        />
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+                            <Button variant="secondary" onClick={() => setShowManualAssignModal(false)}>
+                                Close
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Auto Assignment Modal */}
+            {showAutoAssignModal && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 10000
+                    }}
+                    onClick={() => setShowBulkAssignModal(false)}
+                >
+                    <div
+                        style={{
+                            background: 'var(--bg-card)',
+                            borderRadius: '12px',
+                            padding: '1.5rem',
+                            maxWidth: '500px',
+                            width: '90%',
+                            border: '1px solid var(--border-color)',
+                            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                            <div>
+                                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+                                    Auto-Assign Dates
+                                </h3>
+                                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                                    Select a starting topic and date. Subsequent topics will be auto-assigned.
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setShowAutoAssignModal(false);
+                                    setAutoAssignStartTopic(null);
+                                    setAutoAssignStartDate('');
+                                }}
+                                style={{
+                                    background: 'transparent',
+                                    border: 'none',
+                                    color: 'var(--text-muted)',
+                                    cursor: 'pointer',
+                                    fontSize: '1.5rem',
+                                    padding: '0.25rem'
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                                Starting Topic
+                            </label>
+                            <select
+                                value={autoAssignStartTopic || ''}
+                                onChange={(e) => setAutoAssignStartTopic(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '0.75rem',
+                                    background: 'var(--input-bg)',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '8px',
+                                    color: 'var(--text-primary)',
+                                    fontSize: '0.95rem'
+                                }}
+                            >
+                                <option value="">-- Select a topic to start from --</option>
+                                {topicSchedules.map((schedule) => (
+                                    <option key={schedule.topicId} value={schedule.topicId}>
+                                        {schedule.topicName}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                                Start Date
+                            </label>
+                            <input
+                                type="date"
+                                value={autoAssignStartDate}
+                                onChange={(e) => setAutoAssignStartDate(e.target.value)}
+                                min={new Date(course.startDate).toISOString().split('T')[0]}
+                                max={new Date(course.endDate).toISOString().split('T')[0]}
+                                style={{
+                                    width: '100%',
+                                    padding: '0.75rem',
+                                    background: 'var(--input-bg)',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '8px',
+                                    color: 'var(--text-primary)',
+                                    fontSize: '0.95rem'
+                                }}
+                            />
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                                The selected topic and all subsequent topics will be assigned dates sequentially,
+                                automatically skipping {course.excludedDays?.includes(0) ? 'Sundays' : 'excluded days'}
+                                {course.customHolidays?.length > 0 && ` and ${course.customHolidays.length} holiday(s)`}.
+                            </p>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                            <Button
+                                variant="secondary"
+                                onClick={() => {
+                                    setShowAutoAssignModal(false);
+                                    setAutoAssignStartTopic(null);
+                                    setAutoAssignStartDate('');
+                                }}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="primary"
+                                onClick={handleAutoAssign}
+                                disabled={!autoAssignStartTopic || !autoAssignStartDate}
+                            >
+                                Auto Assign
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

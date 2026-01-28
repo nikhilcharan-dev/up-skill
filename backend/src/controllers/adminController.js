@@ -706,7 +706,7 @@ export const createTrainer = async (req, res) => {
                     <li><strong>Email:</strong> ${email}</li>
                     <li><strong>Password:</strong> ${password}</li>
                 </ul>
-                <p>Please login at: <a href="http://localhost:5173/login">Owl Code Portal</a></p>
+                <p>Please login at: <a href="http://owlcode.adityauniversity.in/login">Owl Code Portal</a></p>
                 <p>Happy Onboarding!</p>
             </div>
         `;

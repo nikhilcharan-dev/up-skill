@@ -14,6 +14,7 @@ const CourseSchema = new mongoose.Schema({
     // Course-specific date assignments for modules and their topics
     moduleSchedule: [{
         moduleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Module' },
+        testLink: { type: String, default: '' }, // Unstop test link for this module
         topicSchedules: [{
             topicId: { type: mongoose.Schema.Types.ObjectId, ref: 'Topic' },
             date: Date

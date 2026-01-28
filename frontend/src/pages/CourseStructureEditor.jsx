@@ -83,8 +83,9 @@ function CourseStructureEditor() {
         }
     };
 
-    const handleScheduleSave = (topicSchedules) => {
+    const handleScheduleSave = (topicSchedules, testLink = '') => {
         // topicSchedules is array of { topicId, date }
+        // testLink is optional Unstop URL string
         if (!selectedModuleForScheduling) return;
 
         const moduleId = selectedModuleForScheduling._id;
@@ -95,6 +96,7 @@ function CourseStructureEditor() {
 
         const moduleScheduleEntry = {
             moduleId: moduleId,
+            testLink: testLink,
             topicSchedules: topicSchedules
         };
 
@@ -224,6 +226,7 @@ function CourseStructureEditor() {
                                         <h3 className="module-title group-hover:text-blue-400 transition-colors">{module.title}</h3>
                                         <p className="module-desc">{module.description || 'No description provided.'}</p>
 
+
                                         <div className="card-footer">
                                             <div className="meta-stats">
                                                 <span className="stat-item">
@@ -234,6 +237,31 @@ function CourseStructureEditor() {
                                                     <span className="w-2 h-2 rounded-full bg-purple-500"></span>
                                                     {totalProblems} Problems
                                                 </span>
+                                                {moduleSchedule?.testLink && (
+                                                    <span className="stat-item">
+                                                        <a
+                                                            href={moduleSchedule.testLink}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            style={{
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '0.25rem',
+                                                                color: 'var(--accent-primary)',
+                                                                textDecoration: 'none',
+                                                                transition: 'all 0.2s'
+                                                            }}
+                                                            onMouseOver={(e) => e.target.style.opacity = '0.7'}
+                                                            onMouseOut={(e) => e.target.style.opacity = '1'}
+                                                        >
+                                                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                            </svg>
+                                                            Test Link
+                                                        </a>
+                                                    </span>
+                                                )}
                                             </div>
 
                                             {totalTopics > 0 && (

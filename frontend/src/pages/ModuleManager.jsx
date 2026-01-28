@@ -90,6 +90,16 @@ function ModuleManager() {
         }
     };
 
+    const handleToggleLock = async (module) => {
+        try {
+            await api.put(`/modules/${module._id}`, { isLocked: !module.isLocked });
+            fetchModules(); // Refresh list to reflect changes
+            showToast(`Module ${!module.isLocked ? 'Locked' : 'Unlocked'} successfully`, 'success');
+        } catch (err) {
+            showToast('Failed to update lock status', 'error');
+        }
+    };
+
     if (loading) return <div className="page p-4 flex items-center justify-center h-full"><div className="spinner"></div></div>;
 
     return (
@@ -118,7 +128,19 @@ function ModuleManager() {
                     {modules.map((module) => (
                         <div key={module._id} className="module-card">
                             <div className="module-card-header">
-                                <h3 className="module-title">{module.title}</h3>
+                                <div className="flex justify-between items-start mb-2">
+                                    <h3 className="module-title mb-0">{module.title}</h3>
+                                    <div className="toggle-container mb-0" title={!module.isLocked ? "Lock Module" : "Unlock Module"}>
+                                        <label className="toggle-switch">
+                                            <input
+                                                type="checkbox"
+                                                checked={!module.isLocked}
+                                                onChange={() => handleToggleLock(module)}
+                                            />
+                                            <span className="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
                                 <p className="module-desc">{module.description || 'No description provided.'}</p>
                             </div>
 
@@ -133,6 +155,9 @@ function ModuleManager() {
                                             ⏱️ {module.duration}
                                         </span>
                                     )}
+                                    <span className={`meta-item ml-auto ${module.isLocked ? 'text-red-400' : 'text-green-400'}`}>
+                                        {module.isLocked ? '🔒 Locked' : '🔓 Open'}
+                                    </span>
                                 </div>
 
                                 <div className="module-actions">

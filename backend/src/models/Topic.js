@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { ProblemSchema } from './ProblemSchema.js';
+
 
 const TopicSchema = new mongoose.Schema({
     // dayNumber removed - dynamic scheduling

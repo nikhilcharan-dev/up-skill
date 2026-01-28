@@ -80,7 +80,7 @@ function TraineeList() {
                     </div>
                     <div className="flex gap-2 items-center" style={{ width: '100%' }}>
                         <div className="search-container">
-                            <span className="search-icon">🔍</span>
+                            {/* <span className="search-icon"></span> */}
                             <input
                                 type="text"
                                 className="form-input search-input"

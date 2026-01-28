@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 import '../styles/Modal.css';
 
-function Modal({ isOpen, onClose, title, children, size = 'md' }) {
+function Modal({ isOpen, onClose, title, children, size = 'md', zIndex = 50 }) {
     const overlayRef = useRef();
     const contentRef = useRef();
 
@@ -45,6 +45,7 @@ function Modal({ isOpen, onClose, title, children, size = 'md' }) {
             ref={overlayRef}
             className="modal-overlay"
             onClick={handleOverlayClick}
+            style={{ zIndex }}
         >
             <div ref={contentRef} className={`modal-content modal-${size}`}>
                 <div className="modal-header">

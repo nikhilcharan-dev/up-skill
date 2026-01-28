@@ -221,16 +221,16 @@ function BatchManager() {
                                             <td>
                                                 <div className="flex gap-2">
                                                     <Button variant="secondary" size="sm" onClick={() => handleOpenEditModal(batch)}>
-                                                        ✎
+                                                        Edit
                                                     </Button>
                                                     <Button variant="danger" size="sm" onClick={() => handleDeleteBatch(batch._id)}>
-                                                        ✕
+                                                        Delete
                                                     </Button>
                                                     <Button variant="primary" size="sm" onClick={() => { setSelectedBatchId(batch._id); setShowBulkModal(true); }}>
-                                                        📥 Add Trainees
+                                                        Add Trainees
                                                     </Button>
                                                     <Button variant="secondary" size="sm" onClick={() => { setViewTraineesBatch(batch); setShowViewTraineesModal(true); }}>
-                                                        👥 View Trainees
+                                                        View Trainees
                                                     </Button>
                                                 </div>
                                             </td>

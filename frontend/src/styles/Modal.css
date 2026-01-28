@@ -81,6 +81,10 @@
     max-width: 900px;
 }
 
+.modal-xl {
+    max-width: 1100px;
+}
+
 /* Scrollbar within modal */
 .modal-content::-webkit-scrollbar {
     width: 6px;

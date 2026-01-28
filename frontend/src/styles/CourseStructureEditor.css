@@ -1,0 +1,83 @@
+.course-structure-editor .action-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    /* Space between Toggle and Buttons */
+}
+
+.lock-toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+}
+
+.lock-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    transition: color 0.3s;
+}
+
+.lock-label.locked {
+    color: #f87171;
+    /* red-400 */
+}
+
+.lock-label.unlocked {
+    color: #34d399;
+    /* green-400 */
+}
+
+.toggle-switch {
+    width: 44px;
+    height: 24px;
+    border-radius: 9999px;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-switch.locked {
+    background-color: #ef4444;
+    /* red-500 */
+}
+
+.toggle-switch.unlocked {
+    background-color: #10b981;
+    /* green-500 */
+}
+
+.toggle-thumb {
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.toggle-switch.locked .toggle-thumb {
+    transform: translateX(20px);
+}
+
+.toggle-switch.unlocked .toggle-thumb {
+    transform: translateX(0);
+}
+
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.module-card:hover .button-group {
+    opacity: 1;
+}
+
+/* Ensure module card is relative for positioning contexts */
+.module-card {
+    position: relative;
+}

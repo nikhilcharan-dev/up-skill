@@ -40,9 +40,7 @@ const Toast = ({ notification }) => {
 
     return (
         <div className={`toast toast-${notification.type} toast-${notification.id}`}>
-            <span className="toast-icon">
-                {notification.type === 'error' ? '⚠️' : '✅'}
-            </span>
+            {/* <span className="toast-icon"></span> */}
             <span className="toast-message">{notification.message}</span>
         </div>
     );

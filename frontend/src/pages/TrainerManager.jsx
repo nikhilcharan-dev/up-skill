@@ -91,7 +91,7 @@ function TrainerManager() {
 
                 <div className="flex justify-between items-center mb-6">
                     <div className="search-container" style={{ maxWidth: '400px' }}>
-                        <span className="search-icon">🔍</span>
+                        {/* <span className="search-icon"></span> */}
                         <input
                             type="text"
                             className="form-input search-input"

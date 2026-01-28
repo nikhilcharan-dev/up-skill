@@ -3,6 +3,7 @@ import Login from './pages/Login';
 import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/AdminDashboard';
 import CourseManager from './pages/CourseManager';
+import CourseStructureEditor from './pages/CourseStructureEditor';
 import CourseCalendar from './pages/CourseCalendar';
 import BatchManager from './pages/BatchManager';
 import TraineeList from './pages/TraineeList';
@@ -10,6 +11,7 @@ import TrainerManager from './pages/TrainerManager';
 import ChallengeManager from './pages/ChallengeManager';
 import ChallengeRoadmap from './pages/ChallengeRoadmap';
 import TraineeDashboard from './pages/TraineeDashboard';
+import ModuleDetail from './pages/ModuleDetail';
 import ThemeToggle from './components/ThemeToggle';
 import Notification from './components/Notification';
 
@@ -17,9 +19,7 @@ function App() {
     return (
         <>
             <Notification />
-            <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000 }}>
-                <ThemeToggle />
-            </div>
+
             <Routes>
                 <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route path="/login" element={<Login />} />
@@ -28,6 +28,8 @@ function App() {
                 <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<AdminDashboard />} />
                     <Route path="courses" element={<CourseManager />} />
+                    <Route path="courses/:id/structure" element={<CourseStructureEditor />} />
+                    <Route path="courses/:id/modules/:moduleIdx" element={<ModuleDetail />} />
                     <Route path="courses/:id/calendar" element={<CourseCalendar />} />
                     <Route path="challenges" element={<ChallengeManager />} />
                     <Route path="challenges/:id/roadmap" element={<ChallengeRoadmap />} />

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { AssignmentSchema } from './Course.js';
+import { AssignmentSchema } from './AssignmentSchema.js';
 
 const ChallengeSchema = new mongoose.Schema({
     title: { type: String, required: true, unique: true },

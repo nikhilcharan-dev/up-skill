@@ -58,12 +58,12 @@ function TraineeManager() {
 
                 <div className="grid grid-2 mt-2">
                     <div className="card">
-                        <h3>📊 Progress Tracking</h3>
+                        <h3>Progress Tracking</h3>
                         <p className="text-muted mt-2">Monitor individual trainee progress across assignments</p>
                     </div>
 
                     <div className="card">
-                        <h3>📁 Resume Management</h3>
+                        <h3>Resume Management</h3>
                         <p className="text-muted mt-2">View and manage uploaded trainee resumes</p>
                     </div>
                 </div>

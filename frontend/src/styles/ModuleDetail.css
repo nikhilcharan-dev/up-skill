@@ -1,0 +1,335 @@
+/* ModuleDetail.css */
+
+/* --- Layout & Utilities --- */
+.module-page-header {
+    margin-bottom: 2rem;
+}
+
+.module-title {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.module-description {
+    color: var(--text-secondary);
+    max-width: 800px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* --- Search Bar (Pure Text) --- */
+.search-container {
+    flex: 1;
+    max-width: 500px;
+}
+
+.search-input-premium {
+    width: 100%;
+    padding: 0.8rem 1.5rem;
+    /* No icon padding */
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 100px;
+    /* Pill shape */
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.search-input-premium:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+/* --- Day Card --- */
+.days-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.day-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    /* Smoother radius */
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    cursor: pointer;
+}
+
+.day-card:hover {
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+    transform: scale(1.005);
+}
+
+.day-card-header {
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.01) 0%, rgba(255, 255, 255, 0.03) 100%);
+}
+
+.day-card-main {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+/* Day Badge - Explicit Structuring */
+.day-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+    flex-shrink: 0;
+    position: relative;
+    /* Ensure children don't escape */
+    margin-right: 0;
+    /* Reset any margins */
+}
+
+/* Force elements inside badge to behave */
+.day-badge>* {
+    position: static;
+    transform: none;
+}
+
+.day-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 800;
+    color: var(--accent-primary);
+    line-height: 1.2;
+}
+
+.day-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--text-primary);
+    position: static !important;
+    /* Force static positioning */
+    right: auto !important;
+    top: auto !important;
+}
+
+.day-info h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.day-date {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.day-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* --- Form Layout --- */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+.assignment-form-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .assignment-form-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+
+/* --- Glassmorphism Modal Content --- */
+.glass-modal-content {
+    /* Assuming Modal wrapper provides basic padding/bg, but we override specifically for content */
+    /* If Modal has padding, this fits inside. */
+}
+
+.glass-header {
+    /* Border and layout handled in JSX, flex classes there */
+}
+
+/* Clean Header Badge */
+.day-status-badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    margin-right: 1.5rem;
+}
+
+.day-status-badge .day-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    color: var(--accent-primary);
+    font-weight: 800;
+}
+
+.day-status-badge .day-num {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.modal-topic-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.2;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.resource-pill {
+    padding: 0.5rem 1rem;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.resource-pill:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-primary);
+}
+
+.glass-panel {
+    background: var(--bg-secondary);
+    /* Use the card background instead of semi-transparent black/white */
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.assignment-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--bg-primary);
+    /* Stand out against bg-secondary panel */
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.2s;
+    margin-bottom: 0.75rem;
+}
+
+.assignment-row:hover {
+    background: var(--bg-card-hover);
+    transform: translateX(4px);
+    border-color: var(--accent-primary);
+}
+
+.asgn-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+}
+
+.asgn-tags {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.tag {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.tag.hard {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
+}
+
+.tag.medium {
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.1);
+}
+
+.tag.easy {
+    color: #34d399;
+    background: rgba(52, 211, 153, 0.1);
+}
+
+.tag.source {
+    color: var(--text-secondary);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+}
+
+.tag.cat {
+    color: var(--accent-primary);
+    background: rgba(59, 130, 246, 0.1);
+}

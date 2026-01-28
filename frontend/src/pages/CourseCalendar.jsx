@@ -240,7 +240,7 @@ function CourseCalendar() {
 
                                         {day.hasNote && (
                                             <div className="tag-tiny" style={{ marginTop: '5px', background: 'rgba(59, 130, 246, 0.1)', color: 'var(--accent-primary)', fontSize: '0.6rem' }}>
-                                                📄 Notes
+                                                Notes
                                             </div>
                                         )}
 
@@ -259,12 +259,12 @@ function CourseCalendar() {
                             {/* Trainer Notes Section */}
                             <div className="card-subtle p-4 mb-6" style={{ borderRadius: '12px' }}>
                                 <h4 className="flex items-center gap-2 mb-3" style={{ fontSize: '0.9rem', color: 'var(--accent-primary)' }}>
-                                    <span>📚</span> Trainer Notes (PDF)
+                                    Trainer Notes (PDF)
                                 </h4>
                                 {course.trainerNotes && course.trainerNotes[selectedDate] ? (
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <span style={{ fontSize: '1.5rem' }}>📄</span>
+                                            {/* <span style={{ fontSize: '1.5rem' }}></span> */}
                                             <div>
                                                 <p className="font-bold mb-0">PDF Document Ready</p>
                                                 <a
@@ -300,12 +300,12 @@ function CourseCalendar() {
                             </div>
 
                             <h4 className="flex items-center gap-2 mb-4" style={{ fontSize: '0.9rem', color: 'var(--accent-secondary)' }}>
-                                <span>📝</span> Assignments & Tasks
+                                Assignments & Tasks
                             </h4>
 
                             {assignments.map((asgn, index) => (
                                 <div key={index} className="assignment-form-card">
-                                    <button type="button" className="remove-btn" onClick={() => handleRemoveAssignment(index)}>×</button>
+                                    <button type="button" className="text-xs text-red-500 hover:text-red-400" onClick={() => handleRemoveAssignment(index)}>Remove</button>
 
                                     <div className="form-group full-width">
                                         <label className="form-label">Task Name</label>

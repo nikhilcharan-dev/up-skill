@@ -1,4 +1,44 @@
 import User from '../models/User.js';
+import TopicNote from '../models/TopicNote.js';
+
+// ... existing code ...
+
+// Save or Update a Topic Note
+export const saveTopicNote = async (req, res) => {
+    try {
+        const { courseId, topicId, note } = req.body;
+        const traineeId = req.user.id;
+
+        // Upsert the note
+        const topicNote = await TopicNote.findOneAndUpdate(
+            { user: traineeId, course: courseId, topicId: topicId },
+            { note },
+            { new: true, upsert: true }
+        );
+
+        res.json(topicNote);
+    } catch (err) {
+        res.status(500).json({ msg: err.message });
+    }
+};
+
+// Get a Topic Note
+export const getTopicNote = async (req, res) => {
+    try {
+        const { courseId, topicId } = req.params;
+        const traineeId = req.user.id;
+
+        const topicNote = await TopicNote.findOne({
+            user: traineeId,
+            course: courseId,
+            topicId: topicId
+        });
+
+        res.json(topicNote || { note: '' });
+    } catch (err) {
+        res.status(500).json({ msg: err.message });
+    }
+};
 import TraineeProgress from '../models/TraineeProgress.js';
 import Batch from '../models/Batch.js';
 import Schedule from '../models/Schedule.js';
@@ -53,7 +93,17 @@ export const getDashboard = async (req, res) => {
         const traineeId = req.user.id;
         const progress = await TraineeProgress.find({ trainee: traineeId }).populate('batch');
         const batches = await Batch.find({ trainees: traineeId }).populate('course');
-        res.json({ progress, batches });
+
+        // Filter out locked modules for trainees
+        const sanitizedBatches = batches.map(batch => {
+            const batchObj = batch.toObject();
+            if (batchObj.course && batchObj.course.modules) {
+                batchObj.course.modules = batchObj.course.modules.filter(module => !module.isLocked);
+            }
+            return batchObj;
+        });
+
+        res.json({ progress, batches: sanitizedBatches });
     } catch (err) {
         res.status(500).json({ msg: err.message });
     }

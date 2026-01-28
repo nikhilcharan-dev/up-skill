@@ -140,10 +140,10 @@ function CourseManager() {
                                     <h3 className="course-title">{course.title}</h3>
                                     <div className="course-actions">
                                         <Button variant="secondary" size="sm" onClick={() => handleOpenEditModal(course)}>
-                                            <span className="action-icon">✎</span>
+                                            Edit
                                         </Button>
                                         <Button variant="danger" size="sm" onClick={() => handleDeleteCourse(course._id)}>
-                                            <span className="action-icon">✕</span>
+                                            Delete
                                         </Button>
                                     </div>
                                 </div>
@@ -152,11 +152,11 @@ function CourseManager() {
                                 </p>
                                 <div className="course-footer">
                                     <div className="course-date">
-                                        <span className="calendar-icon">📅</span>
+                                        {/* <span className="calendar-icon"></span> */}
                                         {new Date(course.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} — {new Date(course.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                                     </div>
-                                    <Button variant="primary" size="sm" onClick={() => navigate(`/admin/courses/${course._id}/calendar`)}>
-                                        Manage
+                                    <Button variant="primary" size="sm" onClick={() => navigate(`/admin/courses/${course._id}/structure`)}>
+                                        Manage Structure
                                     </Button>
                                 </div>
                             </div>

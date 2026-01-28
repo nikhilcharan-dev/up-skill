@@ -15,7 +15,7 @@ function AdminLayout() {
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                     className="mobile-toggle-btn"
                 >
-                    {isSidebarOpen ? '✖️' : '☰'}
+                    {isSidebarOpen ? 'Close' : 'Menu'}
                 </button>
             </header>
 

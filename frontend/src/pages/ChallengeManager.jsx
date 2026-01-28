@@ -140,10 +140,10 @@ function ChallengeManager() {
                                     </h3>
                                     <div className="challenge-actions">
                                         <Button variant="secondary" size="sm" onClick={() => handleOpenEditModal(challenge)}>
-                                            <span style={{ opacity: 0.7 }}>✎</span>
+                                            <span>Edit</span>
                                         </Button>
                                         <Button variant="danger" size="sm" onClick={() => handleDeleteChallenge(challenge._id)}>
-                                            <span style={{ opacity: 0.7 }}>✕</span>
+                                            <span>Delete</span>
                                         </Button>
                                     </div>
                                 </div>

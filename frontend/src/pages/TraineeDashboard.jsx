@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Button from '../components/Button';
+import TraineeCourseViewer from '../components/TraineeCourseViewer';
 
 function TraineeDashboard() {
     const navigate = useNavigate();
@@ -25,7 +26,6 @@ function TraineeDashboard() {
             if (response.data.batches?.length > 0) {
                 const firstBatchId = response.data.batches[0]._id;
                 setSelectedBatchId(firstBatchId);
-                fetchSchedule(firstBatchId);
             }
         } catch (err) {
             setError('Failed to load dashboard');
@@ -34,21 +34,8 @@ function TraineeDashboard() {
         }
     };
 
-    const fetchSchedule = async (batchId) => {
-        setLoadingSchedule(true);
-        try {
-            const response = await api.get(`/trainee/batch/${batchId}/schedule`);
-            setSchedule(response.data);
-        } catch (err) {
-            console.error('Failed to load schedule');
-        } finally {
-            setLoadingSchedule(false);
-        }
-    };
-
     const handleBatchChange = (batchId) => {
         setSelectedBatchId(batchId);
-        fetchSchedule(batchId);
     };
 
     const handleResumeUpload = async (e) => {
@@ -96,7 +83,7 @@ function TraineeDashboard() {
 
                 <div className="grid grid-2">
                     <div className="card">
-                        <h3>📚 My Courses & Batches</h3>
+                        <h3>My Courses & Batches</h3>
                         {dashboardData?.batches?.length > 0 ? (
                             <div className="mt-2 flex flex-col gap-2">
                                 {dashboardData.batches.map(b => (
@@ -117,7 +104,7 @@ function TraineeDashboard() {
 
                     {/* Resume Upload */}
                     <div className="card">
-                        <h3>📄 Resume</h3>
+                        <h3>Resume</h3>
                         <form onSubmit={handleResumeUpload} className="mt-2">
                             <input
                                 type="file"
@@ -132,39 +119,24 @@ function TraineeDashboard() {
                     </div>
                 </div>
 
-                {/* Schedule */}
+                {/* Course Content */}
                 <div className="card mt-2">
                     <div className="flex justify-between items-center mb-2">
-                        <h3>📅 Batch Schedule</h3>
-                        {loadingSchedule && <div className="spinner-sm"></div>}
+                        <h3>Course Content</h3>
                     </div>
-                    {schedule?.length > 0 ? (
-                        <table className="table">
-                            <thead>
-                                <tr>
-                                    <th>Day</th>
-                                    <th>Date</th>
-                                    <th>Assignments</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {schedule.map((item) => (
-                                    <tr key={item._id}>
-                                        <td>Day {item.dayNumber}</td>
-                                        <td>{new Date(item.date).toLocaleDateString()}</td>
-                                        <td>{item.assignments?.join(', ') || '-'}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    {dashboardData?.batches?.find(b => b._id === selectedBatchId)?.course ? (
+                        <TraineeCourseViewer
+                            course={dashboardData.batches.find(b => b._id === selectedBatchId).course}
+                            batchId={selectedBatchId}
+                        />
                     ) : (
-                        <p className="text-muted">No schedule available for the selected batch.</p>
+                        <p className="text-muted">Select a batch to view course content.</p>
                     )}
                 </div>
 
                 {/* Progress */}
                 <div className="card mt-2">
-                    <h3>📊 My Progress</h3>
+                    <h3>My Progress</h3>
                     {dashboardData?.progress?.length > 0 ? (
                         <table className="table mt-2">
                             <thead>

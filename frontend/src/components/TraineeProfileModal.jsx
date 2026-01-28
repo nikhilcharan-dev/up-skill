@@ -128,7 +128,7 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
                     <div className="flex flex-col gap-6">
                         <section>
                             <h4 className="section-title" style={{ color: 'var(--accent-primary)' }}>
-                                <span>👤</span> ACCOUNT INFORMATION
+                                <span>User</span> ACCOUNT INFORMATION
                             </h4>
                             <div className="flex flex-col gap-4">
                                 <div className="info-card">
@@ -150,7 +150,7 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
                                     {trainee.resume ? (
                                         <div className="flex flex-col gap-3 mt-2">
                                             <p className="text-success text-sm flex items-center gap-2">
-                                                <span>✅</span> Document uploaded
+                                                <span>Verified</span> Document uploaded
                                             </p>
                                             <a
                                                 href={trainee.resume}
@@ -158,7 +158,7 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
                                                 rel="noopener noreferrer"
                                                 className="btn btn-primary btn-sm flex items-center justify-center gap-2 resume-btn"
                                             >
-                                                <span>👁️</span> View Document
+                                                <span>View</span> View Document
                                             </a>
                                         </div>
                                     ) : (
@@ -173,7 +173,7 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
                     <div className="flex flex-col gap-6">
                         <section>
                             <h4 className="section-title" style={{ color: 'var(--accent-secondary)' }}>
-                                <span>🚀</span> BATCH ENROLLMENTS
+                                <span>Batch</span> BATCH ENROLLMENTS
                             </h4>
                             <div className="flex flex-col gap-3">
                                 {trainee.assignedBatches?.length > 0 ? (
@@ -205,7 +205,7 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
                 <section>
                     <div className="flex justify-between items-center mb-4">
                         <h4 className="section-title" style={{ color: '#FFA116', margin: 0 }}>
-                            <span>💻</span> CODING PROFILES
+                            <span>Coding</span> CODING PROFILES
                         </h4>
                         <Button
                             size="sm"
@@ -295,14 +295,14 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
                                                 {/* Unique Rank & Rating Styling */}
                                                 <div className="flex gap-3">
                                                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2d2d] border border-white/10 shadow-sm">
-                                                        <span className="text-sm">🏆</span>
+                                                        <span className="text-sm">Rank</span>
                                                         <div className="flex flex-col leading-none">
                                                             <span className="text-[0.6rem] text-muted uppercase font-bold tracking-wider">Rank</span>
                                                             <span className="text-sm font-bold text-white">{leetcodeData.ranking?.toLocaleString() || 'N/A'}</span>
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2d2d] border border-white/10 shadow-sm">
-                                                        <span className="text-sm">⚡</span>
+                                                        <span className="text-sm">Rating</span>
                                                         <div className="flex flex-col leading-none">
                                                             <span className="text-[0.6rem] text-muted uppercase font-bold tracking-wider">Rating</span>
                                                             <span className="text-sm font-bold text-white">{leetcodeData.contest?.rating || 'N/A'}</span>
@@ -479,7 +479,7 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
 
                                                 <div className="flex gap-3">
                                                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2d2d] border border-white/10 shadow-sm">
-                                                        <span className="text-sm">📉</span>
+                                                        <span className="text-sm">Rating</span>
                                                         <div className="flex flex-col leading-none">
                                                             <span className="text-[0.6rem] text-muted uppercase font-bold tracking-wider">Rating</span>
                                                             <span className="text-sm font-bold" style={{ color: codeforcesData.rating >= 2400 ? '#ff0000' : codeforcesData.rating >= 2100 ? '#ff8c00' : codeforcesData.rating >= 1900 ? '#a0a' : codeforcesData.rating >= 1600 ? '#0000ff' : codeforcesData.rating >= 1400 ? '#03a89e' : codeforcesData.rating >= 1200 ? '#008000' : '#a0a0a0' }}>
@@ -488,7 +488,7 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2d2d] border border-white/10 shadow-sm">
-                                                        <span className="text-sm">🚀</span>
+                                                        <span className="text-sm">Max</span>
                                                         <div className="flex flex-col leading-none">
                                                             <span className="text-[0.6rem] text-muted uppercase font-bold tracking-wider">Max</span>
                                                             <span className="text-sm font-bold text-white">{codeforcesData.maxRating}</span>
@@ -502,14 +502,14 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
                                     {/* Info Grid */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div className="bg-white/5 p-3 rounded-lg border border-white/10 flex flex-row items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors">
-                                            <span className="text-2xl">🤝</span>
+                                            <span className="text-sm font-bold">Friends</span>
                                             <div>
                                                 <p className="text-[0.6rem] text-muted uppercase font-bold tracking-wider mb-0.5 leading-none">Friend Of</p>
                                                 <p className="text-base font-bold text-white leading-none">{codeforcesData.friendOfCount?.toLocaleString()}</p>
                                             </div>
                                         </div>
                                         <div className="bg-white/5 p-3 rounded-lg border border-white/10 flex flex-row items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors">
-                                            <span className="text-2xl">📅</span>
+                                            <span className="text-sm font-bold">Joined</span>
                                             <div>
                                                 <p className="text-[0.6rem] text-muted uppercase font-bold tracking-wider mb-0.5 leading-none">Registered</p>
                                                 <p className="text-sm font-bold text-white leading-none">
@@ -518,7 +518,7 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
                                             </div>
                                         </div>
                                         <div className="bg-white/5 p-3 rounded-lg border border-white/10 flex flex-row items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors">
-                                            <span className="text-2xl">🟢</span>
+                                            <span className="text-sm font-bold">Online</span>
                                             <div>
                                                 <p className="text-[0.6rem] text-muted uppercase font-bold tracking-wider mb-0.5 leading-none">Last Online</p>
                                                 <p className="text-xs font-bold text-white leading-none">
@@ -578,14 +578,14 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
 
                                                 <div className="flex gap-3">
                                                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2d2d] border border-white/10 shadow-sm">
-                                                        <span className="text-sm">⭐</span>
+                                                        <span className="text-sm">Rating</span>
                                                         <div className="flex flex-col leading-none">
                                                             <span className="text-[0.6rem] text-muted uppercase font-bold tracking-wider">Rating</span>
                                                             <span className="text-sm font-bold text-[#5B4638]">{codechefData.rating}</span>
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2d2d] border border-white/10 shadow-sm">
-                                                        <span className="text-sm">🚀</span>
+                                                        <span className="text-sm">High</span>
                                                         <div className="flex flex-col leading-none">
                                                             <span className="text-[0.6rem] text-muted uppercase font-bold tracking-wider">High</span>
                                                             <span className="text-sm font-bold text-white">{codechefData.maxRating}</span>
@@ -604,14 +604,14 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
                                     {/* Info Grid */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div className="bg-white/5 p-3 rounded-lg border border-white/10 flex flex-row items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors">
-                                            <span className="text-2xl">🌍</span>
+                                            <span className="text-sm font-bold">Global</span>
                                             <div>
                                                 <p className="text-[0.6rem] text-muted uppercase font-bold tracking-wider mb-0.5 leading-none">Global Rank</p>
                                                 <p className="text-base font-bold text-white leading-none">{codechefData.globalRank?.toLocaleString()}</p>
                                             </div>
                                         </div>
                                         <div className="bg-white/5 p-3 rounded-lg border border-white/10 flex flex-row items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors">
-                                            <span className="text-2xl">🏳️</span>
+                                            <span className="text-sm font-bold">Country</span>
                                             <div>
                                                 <p className="text-[0.6rem] text-muted uppercase font-bold tracking-wider mb-0.5 leading-none">Country Rank</p>
                                                 <p className="text-base font-bold text-white leading-none">
@@ -620,7 +620,7 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
                                             </div>
                                         </div>
                                         <div className="bg-white/5 p-3 rounded-lg border border-white/10 flex flex-row items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors">
-                                            <span className="text-2xl">📍</span>
+                                            <span className="text-sm font-bold">Loc</span>
                                             <div>
                                                 <p className="text-[0.6rem] text-muted uppercase font-bold tracking-wider mb-0.5 leading-none">Country</p>
                                                 <p className="text-xs font-bold text-white leading-none">

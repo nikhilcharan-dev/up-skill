@@ -10,6 +10,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { sendMail } from '../utils/sendMail.js';
 import multer from 'multer';
+import { storage } from '../config/cloudinary.js';
 
 // Create a new course
 export const createCourse = async (req, res) => {
@@ -33,7 +34,7 @@ export const createCourse = async (req, res) => {
             excludedDays,
             customHolidays,
             createdBy: req.user.id,
-            dailyAssignments: new Map()
+            modules: req.body.modules || []
         });
         await course.save();
         res.status(201).json(course);
@@ -91,18 +92,24 @@ export const getCourseById = async (req, res) => {
 };
 
 // Update course assignments for a specific day
-export const updateCourseAssignments = async (req, res) => {
+// Update course content (Structure: Modules -> Topics -> Days)
+export const updateCourseContent = async (req, res) => {
     try {
-        const { date, assignments } = req.body;
+        const { modules } = req.body;
+        console.log(`[updateCourseContent] Updating content for ${req.params.id}. Modules received: ${modules?.length}`);
+
         const course = await Course.findById(req.params.id);
         if (!course) return res.status(404).json({ msg: 'Course not found' });
 
-        if (!course.dailyAssignments) course.dailyAssignments = new Map();
-        course.dailyAssignments.set(date, assignments);
-
+        course.modules = modules;
         await course.save();
+        console.log(`[updateCourseContent] Success.`);
         res.json(course);
     } catch (err) {
+        console.error('[updateCourseContent] Error:', err);
+        if (err.name === 'ValidationError') {
+            console.error('[updateCourseContent] Validation Details:', JSON.stringify(err.errors, null, 2));
+        }
         res.status(500).json({ msg: err.message });
     }
 };
@@ -414,53 +421,79 @@ export const assignTrainees = async (req, res) => {
 };
 
 // Generate schedule logic
+// Generate schedule logic
 export const generateSchedule = async (req, res) => {
     try {
-        const { batchId, assignments } = req.body;
-        const batch = await Batch.findById(batchId);
+        const { batchId } = req.body;
+        const batch = await Batch.findById(batchId).populate('course');
         if (!batch) return res.status(404).json({ msg: 'Batch not found' });
+
+        const course = batch.course;
         const start = new Date(batch.startDate);
         const end = new Date(batch.endDate);
         const dayMs = 24 * 60 * 60 * 1000;
+
+        // 1. Build a lookup map for Day Configs from the Course Structure
+        // Map<dayNumber, dayObject>
+        const courseDaysMap = new Map();
+        if (course.modules) {
+            course.modules.forEach(mod => {
+                if (mod.days) {
+                    mod.days.forEach(day => {
+                        courseDaysMap.set(day.dayNumber, day);
+                    });
+                }
+            });
+        }
+
         const scheduleDocs = [];
         let dayNumber = 1;
+
+        // Clear existing schedule for this batch to avoid duplicates/conflicts? 
+        // For now, assuming fresh generation.
+        await Schedule.deleteMany({ batch: batch._id });
+
         for (let d = start; d <= end; d = new Date(d.getTime() + dayMs)) {
-            if (d.getDay() === 0) continue;
+            if (d.getDay() === 0) continue; // Skip Sundays
+
+            // Find config for this dayNumber
+            const dayConfig = courseDaysMap.get(dayNumber);
+
             const schedule = new Schedule({
                 batch: batch._id,
                 date: d,
                 dayNumber,
-                assignments,
+                // If we have a config in Course, use its assignments. Else empty.
+                assignments: dayConfig ? dayConfig.assignments.map(a => a.name) : [],
+                mentorNotes: dayConfig ? dayConfig.trainerNotes : undefined
             });
+
             await schedule.save();
             scheduleDocs.push(schedule);
             dayNumber++;
         }
         res.json(scheduleDocs);
     } catch (err) {
+        console.error('generateSchedule Error:', err);
         res.status(500).json({ msg: err.message });
     }
 };
 // Configure multer for trainer notes
-const notesStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadPath = path.join(process.cwd(), 'uploads', 'notes');
-        fs.mkdirSync(uploadPath, { recursive: true });
-        cb(null, uploadPath);
-    },
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname);
-        cb(null, `notes-${req.params.id}-${Date.now()}${ext}`);
-    },
-});
-
 export const notesUpload = multer({
-    storage: notesStorage,
+    storage: storage,
     fileFilter: (req, file, cb) => {
-        if (file.mimetype === 'application/pdf') {
+        const allowedTypes = [
+            'application/pdf',
+            'application/msword', // .doc
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+            'application/vnd.ms-powerpoint', // .ppt
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation' // .pptx
+        ];
+
+        if (allowedTypes.includes(file.mimetype)) {
             cb(null, true);
         } else {
-            cb(new Error('Only PDF files are allowed'), false);
+            cb(new Error('Only PDF, Word, and PPT files are allowed'), false);
         }
     }
 });
@@ -517,20 +550,61 @@ export const getTraineesByBatch = async (req, res) => {
 export const uploadTrainerNotes = async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ msg: 'No file uploaded' });
-        const { date } = req.body;
-        if (!date) return res.status(400).json({ msg: 'Date is required' });
+
+        // We need identifiers to find the correct nested day
+        const { moduleId, topicId, dayId } = req.body;
 
         const course = await Course.findById(req.params.id);
         if (!course) return res.status(404).json({ msg: 'Course not found' });
 
-        if (!course.trainerNotes) course.trainerNotes = new Map();
+        const notesPath = req.file.path; // Cloudinary URL
 
-        const notesPath = `/uploads/notes/${req.file.filename}`;
-        course.trainerNotes.set(date, notesPath);
+        // Find the specific day subdocument
+        let dayFound = false;
+
+        // Traverse to find the day. 
+        // Note: With Mongoose subdocuments, we can use id() if we have IDs.
+        if (course.modules) {
+            for (let m of course.modules) {
+                if (m._id.toString() === moduleId) {
+                    // Flattened structure: Find day directly in module
+                    if (m.days) {
+                        const day = m.days.id(dayId);
+                        if (day) {
+                            day.trainerNotes = notesPath;
+                            dayFound = true;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (!dayFound) {
+            return res.status(404).json({ msg: 'Target day not found in course structure' });
+        }
 
         await course.save();
         res.json({ msg: 'Notes uploaded successfully', notesUrl: notesPath, course });
     } catch (err) {
+        console.error('uploadTrainerNotes Error:', err);
+        res.status(500).json({ msg: err.message });
+    }
+};
+
+export const uploadResource = async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ msg: 'No file uploaded' });
+        console.log('File Uploaded:', {
+            originalname: req.file.originalname,
+            mimetype: req.file.mimetype,
+            size: req.file.size,
+            path: req.file.path
+        });
+        const filePath = req.file.path; // Cloudinary URL
+        res.json({ msg: 'File uploaded successfully', url: filePath });
+    } catch (err) {
+        console.error('uploadResource Error:', err);
         res.status(500).json({ msg: err.message });
     }
 };
@@ -644,6 +718,42 @@ export const getDashboardStats = async (req, res) => {
         });
     } catch (err) {
         console.error('getDashboardStats Error:', err);
+        res.status(500).json({ msg: err.message });
+    }
+};
+
+// Delete Trainer Notes for a specific day
+export const deleteTrainerNotes = async (req, res) => {
+    try {
+        const { moduleId, dayId } = req.params;
+        const course = await Course.findById(req.params.id);
+
+        if (!course) return res.status(404).json({ msg: 'Course not found' });
+
+        let dayFound = false;
+        if (course.modules) {
+            for (let m of course.modules) {
+                if (m._id.toString() === moduleId) {
+                    if (m.days) {
+                        const day = m.days.id(dayId);
+                        if (day) {
+                            day.trainerNotes = undefined; // Remove the field
+                            dayFound = true;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (!dayFound) {
+            return res.status(404).json({ msg: 'Target day not found' });
+        }
+
+        await course.save();
+        res.json({ msg: 'Notes removed successfully', course });
+    } catch (err) {
+        console.error('deleteTrainerNotes Error:', err);
         res.status(500).json({ msg: err.message });
     }
 };

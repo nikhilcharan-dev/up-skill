@@ -109,17 +109,7 @@ body {
   overflow: hidden;
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--accent-gradient);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
+
 
 .card:hover {
   border-color: rgba(59, 130, 246, 0.4);
@@ -127,9 +117,7 @@ body {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), var(--shadow-premium);
 }
 
-.card:hover::before {
-  opacity: 1;
-}
+
 
 .course-card {
   display: flex;
@@ -458,6 +446,15 @@ h3 {
 
 .bg-primary-subtle {
   background: rgba(59, 130, 246, 0.1);
+}
+
+.bg-accent-subtle {
+  background: rgba(139, 92, 246, 0.15);
+  /* Violet tint */
+}
+
+.text-accent {
+  color: var(--accent-primary);
 }
 
 /* Trainee Profile styles moved to TraineeList.css */

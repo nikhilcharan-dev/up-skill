@@ -21,6 +21,9 @@ const CourseSchema = new mongoose.Schema({
         }]
     }],
 
+    // Modules that are locked for this specific course
+    lockedModules: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Module' }],
+
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, { timestamps: true });
 

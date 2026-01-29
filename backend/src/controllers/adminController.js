@@ -102,8 +102,8 @@ export const getCourseById = async (req, res) => {
 // Update course content (module references and scheduling)
 export const updateCourseContent = async (req, res) => {
     try {
-        const { modules, moduleSchedule } = req.body; // Array of Module IDs + schedule
-        console.log(`[updateCourseContent] Updating content for ${req.params.id}. Modules: ${modules?.length}, Schedule entries: ${moduleSchedule?.length}`);
+        const { modules, moduleSchedule, lockedModules } = req.body; // Array of Module IDs + schedule + locked modules
+        console.log(`[updateCourseContent] Updating content for ${req.params.id}. Modules: ${modules?.length}, Schedule entries: ${moduleSchedule?.length}, Locked modules: ${lockedModules?.length}`);
 
         const course = await Course.findById(req.params.id);
         if (!course) return res.status(404).json({ msg: 'Course not found' });
@@ -143,6 +143,7 @@ export const updateCourseContent = async (req, res) => {
 
         if (modules) course.modules = modules;
         if (moduleSchedule) course.moduleSchedule = moduleSchedule;
+        if (lockedModules !== undefined) course.lockedModules = lockedModules; // Support empty array
 
         await course.save();
         console.log(`[updateCourseContent] Success.`);

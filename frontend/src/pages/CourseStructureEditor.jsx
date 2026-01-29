@@ -57,6 +57,37 @@ function CourseStructureEditor() {
         }
     };
 
+    // --- Helper Functions ---
+
+    const isModuleLocked = (moduleId) => {
+        return course.lockedModules?.some(id => id.toString() === moduleId.toString()) || false;
+    };
+
+    const toggleModuleLock = async (e, module) => {
+        e.stopPropagation();
+        const isLocked = isModuleLocked(module._id);
+        let newLockedModules = [...(course.lockedModules || [])];
+
+        if (isLocked) {
+            // Unlock - remove from array
+            newLockedModules = newLockedModules.filter(id => id.toString() !== module._id.toString());
+        } else {
+            // Lock - add to array
+            newLockedModules.push(module._id);
+        }
+
+        try {
+            const response = await api.put(`/admin/course/${id}/content`, {
+                modules: course.modules.map(m => m._id),
+                lockedModules: newLockedModules
+            });
+            setCourse(response.data);
+            showToast(`Module ${isLocked ? 'unlocked' : 'locked'} successfully`, 'success');
+        } catch (err) {
+            showToast('Failed to update lock status', 'error');
+        }
+    };
+
     // --- Action Handlers ---
 
     const openAddModule = () => {
@@ -199,7 +230,31 @@ function CourseStructureEditor() {
                                     >
                                         <div className="card-header">
                                             <div className="module-index-badge">Module {mIdx + 1}</div>
+                                            {isModuleLocked(module._id) && (
+                                                <span className="lock-badge" style={{
+                                                    background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                                                    padding: '0.25rem 0.5rem',
+                                                    borderRadius: '0.375rem',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: '600',
+                                                    color: 'white',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.25rem'
+                                                }}>
+                                                    🔒 Locked
+                                                </span>
+                                            )}
                                             <div className="card-actions">
+                                                <Button
+                                                    size="sm"
+                                                    variant={isModuleLocked(module._id) ? "success" : "warning"}
+                                                    onClick={(e) => toggleModuleLock(e, module)}
+                                                    className="py-1 px-2 text-xs"
+                                                    title={isModuleLocked(module._id) ? "Unlock module for trainees" : "Lock module from trainees"}
+                                                >
+                                                    {isModuleLocked(module._id) ? '🔓 Unlock' : '🔒 Lock'}
+                                                </Button>
                                                 <Button
                                                     size="sm"
                                                     variant="secondary"

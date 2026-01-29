@@ -7,8 +7,6 @@ const ModuleSchema = new mongoose.Schema({
     // References to independent Topic entities
     topics: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Topic' }],
 
-    isLocked: { type: Boolean, default: false },
-
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });
 

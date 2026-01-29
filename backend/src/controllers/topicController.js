@@ -35,7 +35,10 @@ export const createTopic = async (req, res) => {
 // Get all topics
 export const getTopics = async (req, res) => {
     try {
-        const topics = await Topic.find().populate('createdBy', 'name email');
+        const topics = await Topic.find()
+            .populate('createdBy', 'name email')
+            .populate('assignmentProblems', 'title difficulty platform')
+            .populate('practiceProblems', 'title difficulty platform');
         res.json(topics);
     } catch (err) {
         console.error('getTopics Error:', err);

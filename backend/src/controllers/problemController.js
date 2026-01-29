@@ -41,9 +41,13 @@ export const getProblems = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const query = {};
+        let sort = { createdAt: -1 };
+        let projection = {};
 
         if (search) {
             query.$text = { $search: search };
+            projection = { score: { $meta: "textScore" } };
+            sort = { score: { $meta: "textScore" } };
         }
 
         if (platform) query.platform = platform;
@@ -52,12 +56,12 @@ export const getProblems = async (req, res) => {
 
         // If all=true, return without pagination (for dropdowns)
         if (req.query.all === 'true') {
-            const problems = await Problem.find(query).sort({ createdAt: -1 });
+            const problems = await Problem.find(query, projection).sort(sort);
             return res.json(problems);
         }
 
-        const problems = await Problem.find(query)
-            .sort({ createdAt: -1 })
+        const problems = await Problem.find(query, projection)
+            .sort(sort)
             .skip(skip)
             .limit(limit);
 

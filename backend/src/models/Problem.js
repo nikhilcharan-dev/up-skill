@@ -37,6 +37,6 @@ const ProblemSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Index for searching
-ProblemSchema.index({ title: 'text', tags: 'text' });
+ProblemSchema.index({ title: 'text', tags: 'text' }, { weights: { title: 10, tags: 1 } });
 
 export default mongoose.model('Problem', ProblemSchema);

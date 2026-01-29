@@ -20,6 +20,9 @@ function TopicContentEditor() {
     const [selectionType, setSelectionType] = useState(null);
     const [availableProblems, setAvailableProblems] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [filterCategory, setFilterCategory] = useState('');
+    const [filterDifficulty, setFilterDifficulty] = useState('');
+    const [filterTags, setFilterTags] = useState('');
 
     useEffect(() => {
         fetchTopicData();
@@ -27,7 +30,7 @@ function TopicContentEditor() {
 
     useEffect(() => {
         if (detailsModalOpen) fetchProblems();
-    }, [detailsModalOpen, searchQuery]);
+    }, [detailsModalOpen, searchQuery, filterCategory, filterDifficulty, filterTags]); // Add new dependencies
 
     const fetchTopicData = async () => {
         try {
@@ -45,9 +48,15 @@ function TopicContentEditor() {
 
     const fetchProblems = async () => {
         try {
-            const { data } = await api.get('/problems', {
-                params: { search: searchQuery, limit: 20 }
-            });
+            const params = {
+                search: searchQuery,
+                limit: 20,
+                ...(filterCategory && { category: filterCategory }),
+                ...(filterDifficulty && { difficulty: filterDifficulty }),
+                ...(filterTags && { tags: filterTags }) // Assuming backend supports comma-separated tags or partial match
+            };
+
+            const { data } = await api.get('/problems', { params });
             setAvailableProblems(data.problems || []);
         } catch (err) {
             console.error(err);
@@ -319,6 +328,45 @@ function TopicContentEditor() {
                         onChange={e => setSearchQuery(e.target.value)}
                         autoFocus
                     />
+
+                    {/* Filters Row */}
+                    <div className="modal-filters-row" style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem' }}>
+                        <select
+                            className="modal-filter-input"
+                            value={filterCategory}
+                            onChange={(e) => setFilterCategory(e.target.value)}
+                            style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                        >
+                            <option value="">All Topics</option>
+                            <option value="DSA">DSA</option>
+                            <option value="SQL">SQL</option>
+                            <option value="System Design">System Design</option>
+                            <option value="Web Dev">Web Dev</option>
+                            <option value="CS Fundamentals">CS Fundamentals</option>
+                        </select>
+
+                        <select
+                            className="modal-filter-input"
+                            value={filterDifficulty}
+                            onChange={(e) => setFilterDifficulty(e.target.value)}
+                            style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                        >
+                            <option value="">All Difficulties</option>
+                            <option value="Easy">Easy</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Hard">Hard</option>
+                        </select>
+
+                        <input
+                            type="text"
+                            className="modal-filter-input"
+                            placeholder="Filter by tags (comma separated)"
+                            value={filterTags}
+                            onChange={(e) => setFilterTags(e.target.value)}
+                            style={{ flex: 1.5, padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                        />
+                    </div>
+
                     <div className="modal-list-container custom-scrollbar">
                         {availableProblems.map(problem => {
                             const isAssigned = selectionType === 'assignment'
@@ -334,6 +382,7 @@ function TopicContentEditor() {
                                                 {problem.difficulty}
                                             </span>
                                             <span className="problem-source">{problem.platform}</span>
+                                            <span className="problem-category-tag" style={{ marginLeft: '0.5rem', fontSize: '0.75rem', opacity: 0.8 }}>{problem.category}</span>
                                         </div>
                                     </div>
                                     <Button

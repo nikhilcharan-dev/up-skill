@@ -11,19 +11,18 @@ jobs:
     environment: production
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.VM_SSH_KEY }}
 
-      - name: Add server to known_hosts
+      - name: Disable host key checking
         run: |
-          ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+          echo -e "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
-      - name: Deploy Backend + Frontend
+      - name: Deploy
         run: |
           ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
 
@@ -40,5 +39,5 @@ jobs:
           npm run build
           pm2 restart upskill-admin || pm2 start npm --name upskill-admin -- start
 
-          echo "✅ Deployment successful"
+          echo "✅ Deploy complete"
           EOF

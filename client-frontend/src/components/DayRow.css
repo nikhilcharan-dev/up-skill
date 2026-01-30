@@ -1,0 +1,127 @@
+.day-row-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    cursor: pointer;
+    /* Ensure pointer on container */
+}
+
+.day-row-container.expanded {
+    background: var(--bg-secondary);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.day-row {
+    display: grid;
+    grid-template-columns: 0.8fr 1.5fr 3fr 0.3fr;
+    padding: 16px 20px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.day-row-container.expanded .day-row {
+    box-shadow: none;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.day-row:hover {
+    border-color: var(--accent-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.day-row-container.expanded .day-row:hover {
+    transform: none;
+}
+
+/* ... keep existing inner column styles ... */
+.day-date-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.day-full {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.day-topic-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.topic-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.day-stats-col {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    justify-content: flex-end;
+}
+
+.stat-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.stat-val {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.stat-val.perfect-green {
+    color: #10b981;
+}
+
+.file-icon-btn {
+    display: flex;
+    align-items: center;
+    color: #6b7280;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 2px;
+}
+
+.file-icon-btn:hover {
+    color: #3b82f6;
+}
+
+.day-action-col {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.action-icon {
+    color: #9ca3af;
+    transition: color 0.2s;
+}
+
+.day-row:hover .action-icon {
+    color: #3b82f6;
+}

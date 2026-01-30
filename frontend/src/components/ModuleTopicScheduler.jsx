@@ -9,8 +9,16 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
     const [loading, setLoading] = useState(true);
     const [showManualAssignModal, setShowManualAssignModal] = useState(false);
     const [showAutoAssignModal, setShowAutoAssignModal] = useState(false);
+
+    // Auto-assign state
     const [autoAssignStartTopic, setAutoAssignStartTopic] = useState(null);
     const [autoAssignStartDate, setAutoAssignStartDate] = useState('');
+
+    // Range-assign state (modal specific)
+    const [editingTopicId, setEditingTopicId] = useState(null); // Which topic we are editing ranges for
+    const [showRangeModal, setShowRangeModal] = useState(false);
+    const [rangeStart, setRangeStart] = useState('');
+    const [rangeEnd, setRangeEnd] = useState('');
 
     useEffect(() => {
         initializeSchedules();
@@ -30,11 +38,19 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
         // Initialize test link from existing schedule
         setTestLink(existingSchedule?.testLink || '');
 
+        // Group existing schedules by topicId
+        const scheduleMap = new Map(); // topicId -> Set(dates)
+        existingSchedule?.topicSchedules?.forEach(ts => {
+            const tId = ts.topicId.toString();
+            if (!scheduleMap.has(tId)) scheduleMap.set(tId, new Set());
+            if (ts.date) scheduleMap.get(tId).add(new Date(ts.date).toISOString().split('T')[0]);
+        });
+
         // Initialize schedule for each topic
         const schedules = module.topics.map(topic => {
-            const existingTopicSchedule = existingSchedule?.topicSchedules?.find(
-                ts => ts.topicId.toString() === topic._id.toString()
-            );
+            const tId = topic._id.toString();
+            const datesSet = scheduleMap.get(tId) || new Set();
+            const sortedDates = Array.from(datesSet).sort();
 
             return {
                 topicId: topic._id,
@@ -42,15 +58,17 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
                 topicName: topic.topicName || topic.title || 'Untitled Topic',
                 description: topic.description,
                 assignmentCount: (topic.assignmentProblems?.length || 0) + (topic.practiceProblems?.length || 0),
-                date: existingTopicSchedule?.date || ''
+                dates: sortedDates // Array of date strings 'YYYY-MM-DD'
             };
         });
 
-        // Sort by existing date if available
+        // Sort by first date if available
         schedules.sort((a, b) => {
-            if (a.date && b.date) return new Date(a.date) - new Date(b.date);
-            if (a.date) return -1;
-            if (b.date) return 1;
+            const dateA = a.dates[0];
+            const dateB = b.dates[0];
+            if (dateA && dateB) return new Date(dateA) - new Date(dateB);
+            if (dateA) return -1;
+            if (dateB) return 1;
             return 0;
         });
 
@@ -73,7 +91,7 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
 
         // 2. Add dates from CURRENT module state
         topicSchedules.forEach(ts => {
-            if (ts.date) allDates.add(new Date(ts.date).toISOString().split('T')[0]);
+            ts.dates.forEach(d => allDates.add(d));
         });
 
         // Sort dates chronologically
@@ -88,27 +106,64 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
         return map;
     }, [course.moduleSchedule, topicSchedules, module._id]);
 
-    const handleDateChange = (topicId, newDate) => {
-        if (newDate) {
-            const duplicateTopic = topicSchedules.find(
-                ts => ts.topicId !== topicId && ts.date === newDate
-            );
+    const handleSingleDateChange = (topicId, newDate) => {
+        setTopicSchedules(prev => {
+            return prev.map(ts => {
+                if (ts.topicId === topicId) {
+                    // If clearing date
+                    if (!newDate) return { ...ts, dates: [] };
 
-            if (duplicateTopic) {
-                showToast(
-                    `Date ${new Date(newDate).toLocaleDateString()} is already assigned to "${duplicateTopic.topicName}"`,
-                    'error'
-                );
-                return;
-            }
+                    // Replace all existing dates with this single date (Single Date mode)
+                    return { ...ts, dates: [newDate] };
+                }
+                return ts;
+            });
+        });
+    };
+
+    const handleSaveRange = () => {
+        if (!editingTopicId || !rangeStart || !rangeEnd) {
+            showToast('Please select valid start and end dates', 'error');
+            return;
         }
 
-        setTopicSchedules(prev => {
-            const updated = prev.map(ts =>
-                ts.topicId === topicId ? { ...ts, date: newDate } : ts
-            );
-            return updated;
-        });
+        const start = new Date(rangeStart);
+        const end = new Date(rangeEnd);
+
+        if (start > end) {
+            showToast('Start date cannot be after end date', 'error');
+            return;
+        }
+
+        const generatedDates = [];
+        const excludedDays = course.excludedDays || [0];
+        const holidays = (course.customHolidays || []).map(h => new Date(h).toISOString().split('T')[0]);
+
+        const current = new Date(start);
+        while (current <= end) {
+            const dateStr = current.toISOString().split('T')[0];
+            const dayOfWeek = current.getDay();
+
+            if (!excludedDays.includes(dayOfWeek) && !holidays.includes(dateStr)) {
+                generatedDates.push(dateStr);
+            }
+            current.setDate(current.getDate() + 1);
+        }
+
+        if (generatedDates.length === 0) {
+            showToast('No valid dates in selected range (all are holidays/excluded)', 'warning');
+            return;
+        }
+
+        setTopicSchedules(prev => prev.map(ts =>
+            ts.topicId === editingTopicId ? { ...ts, dates: generatedDates } : ts
+        ));
+
+        setShowRangeModal(false);
+        setEditingTopicId(null);
+        setRangeStart('');
+        setRangeEnd('');
+        showToast(`Assigned ${generatedDates.length} days to topic`, 'success');
     };
 
     const validateDates = () => {
@@ -117,28 +172,29 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
         const dateMap = new Map();
 
         for (const schedule of topicSchedules) {
-            if (!schedule.date) continue;
+            for (const dateStr of schedule.dates) {
+                const topicDate = new Date(dateStr);
 
-            const topicDate = new Date(schedule.date);
+                // Check if date is within course range
+                if (topicDate < courseStart || topicDate > courseEnd) {
+                    showToast(
+                        `${schedule.topicName}: Date ${dateStr} must be between ${courseStart.toLocaleDateString()} and ${courseEnd.toLocaleDateString()}`,
+                        'error'
+                    );
+                    return false;
+                }
 
-            // Check if date is within course range
-            if (topicDate < courseStart || topicDate > courseEnd) {
-                showToast(
-                    `${schedule.topicName}: Date must be between ${courseStart.toLocaleDateString()} and ${courseEnd.toLocaleDateString()}`,
-                    'error'
-                );
-                return false;
+                // Check for duplicate dates (across different topics)
+                // dateMap stores: dateString -> topicName
+                if (dateMap.has(dateStr)) {
+                    showToast(
+                        `Multiple topics assigned to ${topicDate.toLocaleDateString()}: "${dateMap.get(dateStr)}" and "${schedule.topicName}"`,
+                        'error'
+                    );
+                    return false;
+                }
+                dateMap.set(dateStr, schedule.topicName);
             }
-
-            // Check for duplicate dates
-            if (dateMap.has(schedule.date)) {
-                showToast(
-                    `Multiple topics assigned to ${topicDate.toLocaleDateString()}: "${dateMap.get(schedule.date)}" and "${schedule.topicName}"`,
-                    'error'
-                );
-                return false;
-            }
-            dateMap.set(schedule.date, schedule.topicName);
         }
         return true;
     };
@@ -146,19 +202,22 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
     const handleSave = () => {
         if (!validateDates()) return;
 
-        // Filter out topics without dates and format for backend
-        const schedulesToSave = topicSchedules
-            .filter(ts => ts.date)
-            .map(ts => ({
-                topicId: ts.topicId,
-                date: ts.date
-            }));
+        // Flatten: Create one entry per date per topic
+        const schedulesToSave = [];
+        topicSchedules.forEach(ts => {
+            ts.dates.forEach(date => {
+                schedulesToSave.push({
+                    topicId: ts.topicId,
+                    date: date
+                });
+            });
+        });
 
         onSave(schedulesToSave, testLink);
     };
 
     const clearAllDates = () => {
-        setTopicSchedules(prev => prev.map(ts => ({ ...ts, date: '' })));
+        setTopicSchedules(prev => prev.map(ts => ({ ...ts, dates: [] })));
     };
 
     const handleAutoAssign = () => {
@@ -195,7 +254,11 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
                 break;
             }
 
-            updatedSchedules[i].date = currentDate.toISOString().split('T')[0];
+            // In Auto Assign, we treat topics as SINGLE DAY by default for simplicity,
+            // or we could preserve existing duration?
+            // User requirement: "auto assign... starting from a user-selected topic".
+            // Implementation: Assign 1 day per topic for now.
+            updatedSchedules[i].dates = [currentDate.toISOString().split('T')[0]];
 
             // Move to next day
             currentDate.setDate(currentDate.getDate() + 1);
@@ -208,39 +271,21 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
         showToast('Dates auto-assigned successfully', 'success');
     };
 
-    const handleBulkAssign = (startDate) => {
-        const courseStart = new Date(course.startDate);
-        const courseEnd = new Date(course.endDate);
-        const excludedDays = course.excludedDays || [0]; // Default: skip Sundays
-        const holidays = (course.customHolidays || []).map(h => new Date(h).toISOString().split('T')[0]);
-
-        let currentDate = new Date(startDate);
-        const updatedSchedules = [...topicSchedules];
-
-        for (let i = 0; i < updatedSchedules.length; i++) {
-            // Skip to next valid date
-            while (
-                currentDate <= courseEnd &&
-                (excludedDays.includes(currentDate.getDay()) ||
-                    holidays.includes(currentDate.toISOString().split('T')[0]))
-            ) {
-                currentDate.setDate(currentDate.getDate() + 1);
+    const openRangeModal = (topicId) => {
+        const topic = topicSchedules.find(ts => ts.topicId === topicId);
+        if (topic) {
+            setEditingTopicId(topicId);
+            // Pre-fill if existing
+            if (topic.dates.length > 0) {
+                const dates = [...topic.dates].sort();
+                setRangeStart(dates[0]);
+                setRangeEnd(dates[dates.length - 1]);
+            } else {
+                setRangeStart('');
+                setRangeEnd('');
             }
-
-            if (currentDate > courseEnd) {
-                showToast('Not enough valid dates in course range', 'error');
-                break;
-            }
-
-            updatedSchedules[i].date = currentDate.toISOString().split('T')[0];
-
-            // Move to next day
-            currentDate.setDate(currentDate.getDate() + 1);
+            setShowRangeModal(true);
         }
-
-        setTopicSchedules(updatedSchedules);
-        setShowBulkAssignModal(false);
-        showToast('Dates assigned successfully', 'success');
     };
 
     if (loading) {
@@ -590,7 +635,11 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             {topicSchedules.map((schedule, index) => {
-                                const dayNum = schedule.date ? globalDayMap.get(new Date(schedule.date).toISOString().split('T')[0]) : null;
+                                const dates = schedule.dates || [];
+                                const hasDates = dates.length > 0;
+                                // Get day numbers for all assigned dates
+                                const dayNums = dates.map(d => globalDayMap.get(d)).filter(d => d).join(', ');
+
                                 return (
                                     <div
                                         key={schedule.topicId}
@@ -604,32 +653,82 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
                                             border: '1px solid var(--border-color)'
                                         }}
                                     >
-                                        <div style={{ minWidth: '50px', textAlign: 'center' }}>
-                                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '2px' }}>Day</div>
-                                            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: dayNum ? 'var(--accent-primary)' : 'var(--text-muted)' }}>
-                                                {dayNum || '-'}
+                                        <div style={{ minWidth: '60px', textAlign: 'center' }}>
+                                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '2px' }}>Day(s)</div>
+                                            <div style={{ fontSize: '1rem', fontWeight: 700, color: hasDates ? 'var(--accent-primary)' : 'var(--text-muted)' }}>
+                                                {dayNums || '-'}
                                             </div>
                                         </div>
                                         <div style={{ flex: 1 }}>
                                             <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{schedule.topicName}</div>
                                             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                                                {schedule.assignmentCount} problems
+                                                {schedule.assignmentCount} problems • {dates.length} day(s) assigned
                                             </div>
+
                                         </div>
-                                        <input
-                                            type="date"
-                                            value={schedule.date ? new Date(schedule.date).toISOString().split('T')[0] : ''}
-                                            onChange={(e) => handleDateChange(schedule.topicId, e.target.value)}
-                                            min={new Date(course.startDate).toISOString().split('T')[0]}
-                                            max={new Date(course.endDate).toISOString().split('T')[0]}
-                                            style={{
-                                                padding: '0.5rem',
-                                                borderRadius: '6px',
-                                                border: '1px solid var(--border-color)',
-                                                background: 'var(--input-bg)',
-                                                color: 'var(--text-primary)'
-                                            }}
-                                        />
+
+                                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                            {hasDates && (
+                                                <div style={{
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: '6px',
+                                                    background: 'var(--bg-primary)',
+                                                    border: '1px solid var(--border-color)',
+                                                    borderRadius: '6px',
+                                                    padding: '4px 8px',
+                                                    fontSize: '0.8rem',
+                                                    color: 'var(--text-primary)',
+                                                    fontWeight: 500,
+                                                    marginRight: '4px'
+                                                }}>
+                                                    <svg width="14" height="14" fill="none" stroke="var(--text-secondary)" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                    {dates.length === 1
+                                                        ? new Date(dates[0]).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+                                                        : (
+                                                            <span>
+                                                                {new Date(dates[0]).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                                                                <span style={{ color: 'var(--text-secondary)', margin: '0 4px' }}>→</span>
+                                                                {new Date(dates[dates.length - 1]).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                            </span>
+                                                        )
+                                                    }
+                                                </div>
+                                            )}
+                                            {/* Single Date Picker - Quick Action */}
+                                            <input
+                                                type="date"
+                                                title="Assign Single Date"
+                                                value={dates.length === 1 ? dates[0] : ''}
+                                                onChange={(e) => handleSingleDateChange(schedule.topicId, e.target.value)}
+                                                min={new Date(course.startDate).toISOString().split('T')[0]}
+                                                max={new Date(course.endDate).toISOString().split('T')[0]}
+                                                style={{
+                                                    padding: '0.5rem',
+                                                    borderRadius: '6px',
+                                                    border: '1px solid var(--border-color)',
+                                                    background: 'var(--input-bg)',
+                                                    color: 'var(--text-primary)',
+                                                    width: '40px', // Compact, just the calendar icon usually
+                                                    cursor: 'pointer'
+                                                }}
+                                            />
+
+                                            {/* Range / Advanced Button */}
+                                            <Button
+                                                variant="secondary"
+                                                size="sm"
+                                                onClick={() => openRangeModal(schedule.topicId)}
+                                                style={{ padding: '0.5rem' }}
+                                                title="Assign Date Range"
+                                            >
+                                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                            </Button>
+                                        </div>
                                     </div>
                                 );
                             })}
@@ -639,6 +738,77 @@ function ModuleTopicScheduler({ course, module, onSave, onClose }) {
                             <Button variant="secondary" onClick={() => setShowManualAssignModal(false)}>
                                 Close
                             </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Range Selection Modal */}
+            {showRangeModal && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 10001
+                    }}
+                    onClick={() => setShowRangeModal(false)}
+                >
+                    <div
+                        style={{
+                            background: 'var(--bg-card)',
+                            borderRadius: '12px',
+                            padding: '1.5rem',
+                            maxWidth: '400px',
+                            width: '90%',
+                            border: '1px solid var(--border-color)',
+                            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1rem' }}>
+                            Assign Date Range
+                        </h3>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.85rem' }}>Start Date</label>
+                                <input
+                                    type="date"
+                                    value={rangeStart}
+                                    onChange={(e) => setRangeStart(e.target.value)}
+                                    className="form-input"
+                                    style={{ width: '100%' }}
+                                />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.85rem' }}>End Date</label>
+                                <input
+                                    type="date"
+                                    value={rangeEnd}
+                                    onChange={(e) => setRangeEnd(e.target.value)}
+                                    className="form-input"
+                                    style={{ width: '100%' }}
+                                />
+                            </div>
+
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                This will assign the topic to all valid days between the start and end dates (inclusive).
+                            </p>
+
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '8px' }}>
+                                <Button variant="secondary" onClick={() => setShowRangeModal(false)}>
+                                    Cancel
+                                </Button>
+                                <Button variant="primary" onClick={handleSaveRange}>
+                                    Apply Range
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>

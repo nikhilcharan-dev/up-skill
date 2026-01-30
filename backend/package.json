@@ -12,6 +12,7 @@
     "dependencies": {
         "axios": "^1.13.3",
         "bcryptjs": "^2.4.3",
+        "cheerio": "^1.2.0",
         "cloudinary": "^1.41.3",
         "cors": "^2.8.5",
         "dotenv": "^16.3.1",
@@ -22,6 +23,7 @@
         "morgan": "^1.10.0",
         "multer": "^1.4.5-lts.1",
         "multer-storage-cloudinary": "^4.0.0",
+        "nodemailer": "^7.0.13",
         "xlsx": "^0.18.5"
     },
     "devDependencies": {

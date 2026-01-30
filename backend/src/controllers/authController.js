@@ -8,7 +8,7 @@ dotenv.config();
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ $or: [{ collegeEmail: email }, { workEmail: email }] });
+        const user = await User.findOne({ workEmail: email });
         if (!user) return res.status(400).json({ msg: 'Invalid credentials' });
         const match = await bcrypt.compare(password, user.password);
         if (!match) return res.status(400).json({ msg: 'Invalid credentials' });

@@ -26,18 +26,25 @@ jobs:
         run: |
           ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
 
-          echo "🚀 Backend"
+          echo "Updating Backend"
           cd /var/www/up-skill/backend
           git pull origin main
           npm install
           pm2 restart upskill-server || pm2 start src/server.js --name upskill-server
 
-          echo "🎨 Frontend"
+          echo "Updating Admin Dashboard"
           cd /var/www/up-skill/frontend
           git pull origin main
           npm install
           npm run build
           pm2 restart upskill-admin || pm2 start npm --name upskill-admin -- start
 
-          echo "✅ Deploy complete"
+          echo "Updating Frontend"
+          cd /var/www/up-skill/client-frontend
+          git pull origin main
+          npm install
+          npm run build
+          pm2 restart upskill-client || pm2 start npm --name upskill-client -- start
+
+          echo "Deploy complete ✅"
           EOF

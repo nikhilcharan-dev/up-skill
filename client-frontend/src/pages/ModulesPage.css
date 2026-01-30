@@ -1,0 +1,386 @@
+.modules-page-container {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 0;
+    /* Removed gap, controlled by padding now */
+    height: 100%;
+    overflow: hidden;
+    padding: 24px;
+    background: var(--bg-primary);
+    /* Use global bg */
+}
+
+.modules-sidebar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+    padding-right: 24px;
+    /* Space before divider */
+    border-right: 1px solid var(--glass-border);
+    /* The crisp divider */
+    height: 100%;
+    min-height: 0;
+}
+
+/* Sidebar scrollbar */
+.modules-sidebar-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.modules-sidebar-list::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+}
+
+.modules-sidebar-list:hover::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+}
+
+.modules-content-area {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* background: var(--bg-secondary); */
+    /* Optional: card bg for main area */
+    border-radius: var(--radius-lg);
+    padding-left: 42px;
+    /* Space after divider */
+    padding-right: 16px;
+}
+
+/* Header Styles */
+.content-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 40px;
+    padding-top: 10px;
+}
+
+.header-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.module-top-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+}
+
+.weeks-tag {
+    background: #fefce8;
+    /* Light yellow bg for tag */
+    color: #854d0e;
+    /* Brownish text */
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    text-transform: lowercase;
+    font-weight: 500;
+    border: 1px solid #fef08a;
+}
+
+/* Dark mode adjustment for tag */
+[data-theme='dark'] .weeks-tag {
+    background: rgba(254, 252, 232, 0.1);
+    color: #fef08a;
+    border-color: rgba(254, 240, 138, 0.2);
+}
+
+.module-main-title {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+/* Stats Card */
+.header-stats-card {
+    display: flex;
+    align-items: center;
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.stat-block {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 8px;
+}
+
+.stat-icon {
+    color: var(--text-secondary);
+}
+
+.stat-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-big-val {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ef4444;
+    /* Redish for 42% */
+    line-height: 1.1;
+}
+
+.stat-big-val.green {
+    color: #10b981;
+    /* Green for 88% */
+}
+
+.stat-tiny-label {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+}
+
+.stat-divider {
+    width: 1px;
+    height: 32px;
+    background: var(--glass-border);
+    margin: 0 12px;
+}
+
+.section-divider {
+    border-top: 1px solid var(--glass-border);
+}
+
+.days-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 40px;
+}
+
+/* Scrollbar tweaks */
+.days-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.days-list::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+.days-list:hover::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+}
+
+/* Progress Tracker Styles */
+.header-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex: 1;
+    margin-left: 32px;
+}
+
+.progress-tracker-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 10px 24px;
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='dark'] .progress-tracker-card {
+    background: #09090b;
+    border-color: var(--glass-border);
+}
+
+.progress-main-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.progress-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.progress-percentage {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.progress-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.info-tooltip-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    cursor: help;
+}
+
+/* Progress Bar & Milestones */
+.progress-bar-container {
+    position: relative;
+    height: 30px;
+    /* Space for bubbles */
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.progress-track {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    position: relative;
+    overflow: visible;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent-primary);
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    transition: width 0.5s ease-out;
+}
+
+.milestone {
+    position: absolute;
+    transform: translate(-50%, calc(-100% + 6px));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+    top: 50%;
+}
+
+.m-40 {
+    left: 40%;
+}
+
+.m-60 {
+    left: 60%;
+}
+
+.m-80 {
+    left: 80%;
+}
+
+.m-100 {
+    left: 100%;
+}
+
+.milestone-bubble {
+    background: var(--accent-primary);
+    color: white;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.milestone-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 2px solid var(--glass-border);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.milestone-flag {
+    font-size: 1rem;
+    margin-bottom: 2px;
+    width: 24px;
+    height: 24px;
+    transform: translateX(10px) translateY(-2px);
+    /* Shift flag slightly right */
+}
+
+/* Stats Pills */
+.tracker-stats-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.tracker-stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    font-size: 0.8rem;
+    flex: 1;
+    justify-content: space-between;
+}
+
+.green-pill {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.blue-pill {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
+.yellow-pill {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.pill-icon {
+    font-size: 1rem;
+}
+
+.pill-label {
+    font-weight: 500;
+    margin-right: auto;
+}
+
+.pill-val {
+    background: white;
+    color: black;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+[data-theme='dark'] .pill-val {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}

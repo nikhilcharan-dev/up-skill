@@ -18,7 +18,9 @@ export const verifyToken = (req, res, next) => {
 };
 
 export const authorizeRoles = (...roles) => (req, res, next) => {
+    console.log(`[AuthDebug] User Role: ${req.user?.role}, Required Roles: ${roles}`);
     if (!roles.includes(req.user.role)) {
+        console.log('[AuthDebug] Access Denied');
         return res.status(403).json({ msg: 'Access denied' });
     }
     next();

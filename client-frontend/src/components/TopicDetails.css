@@ -1,0 +1,33 @@
+.topic-details-inline {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--glass-border);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.topic-content-inline {
+    padding: 0;
+    background: var(--bg-primary);
+    /* Use primary bg for content area like Figma usually does for contrast */
+}
+
+/* Override Header styles for inline context if needed */
+.topic-details-inline .topic-header-container {
+    background: var(--bg-secondary);
+}
+
+.topic-details-inline .topic-top-bar {
+    padding: 12px 24px;
+    border-bottom: none;
+}

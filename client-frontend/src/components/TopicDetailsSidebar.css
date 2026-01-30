@@ -1,0 +1,63 @@
+.topic-sidebar {
+    width: 60px;
+    background: #3b82f6;
+    /* Blue sidebar */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    padding-top: 16px;
+    flex-shrink: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.sidebar-top-icon {
+    margin-bottom: 24px;
+    opacity: 0.9;
+    cursor: pointer;
+}
+
+.sidebar-nav-item {
+    width: 100%;
+    height: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.75rem;
+    position: relative;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.sidebar-nav-item:hover,
+.sidebar-nav-item.active {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: white;
+}
+
+.q-label {
+    font-weight: 500;
+}
+
+.q-status-icon {
+    margin-top: 2px;
+    opacity: 0.8;
+}
+
+/* Scrollbar hidden for cleanliness */
+.topic-sidebar::-webkit-scrollbar {
+    width: 0;
+}

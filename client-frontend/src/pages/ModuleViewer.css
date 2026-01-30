@@ -1,0 +1,205 @@
+.viewer-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: var(--spacing-md);
+}
+
+.back-btn {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.viewer-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: var(--spacing-lg);
+    flex: 1;
+    min-height: 0;
+    /* Important for grid scrolling */
+}
+
+.content-area {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+}
+
+.video-placeholder {
+    aspect-ratio: 16/9;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fake-player,
+.text-content-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-secondary);
+    gap: var(--spacing-md);
+}
+
+.player-icon,
+.text-icon {
+    color: var(--accent-primary);
+    opacity: 0.8;
+}
+
+.chapter-details {
+    padding: var(--spacing-lg);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.chapter-details h2 {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-xs);
+}
+
+.chapter-meta {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.divider {
+    border: 0;
+    height: 1px;
+    background: var(--glass-border);
+    margin-bottom: var(--spacing-md);
+}
+
+.description-text {
+    color: #ccc;
+    line-height: 1.7;
+}
+
+/* Sidebar */
+.syllabus-sidebar {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    height: fit-content;
+    max-height: 100%;
+}
+
+.syllabus-header {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.syllabus-header h3 {
+    font-size: 1rem;
+    margin-bottom: var(--spacing-xs);
+}
+
+.progress-mini {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.progress-bar-bg.small {
+    margin: 0;
+    flex: 1;
+    height: 4px;
+}
+
+.chapter-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: var(--spacing-xs);
+}
+
+.chapter-item {
+    display: flex;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: var(--transition-fast);
+    align-items: flex-start;
+}
+
+.chapter-item:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.chapter-item.active {
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.chapter-status {
+    margin-top: 2px;
+}
+
+.status-icon.completed {
+    color: #34d399;
+}
+
+.status-icon.pending {
+    color: #475569;
+}
+
+.current-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    border: 2px solid rgba(99, 102, 241, 0.3);
+}
+
+.chapter-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.chapter-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #e2e8f0;
+}
+
+.chapter-duration {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 1024px) {
+    .viewer-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        overflow-y: auto;
+    }
+
+    .content-area,
+    .syllabus-sidebar {
+        height: auto;
+        max-height: none;
+    }
+}

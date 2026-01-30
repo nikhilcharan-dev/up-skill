@@ -1,5 +1,6 @@
 import CodingProfile from '../models/CodingProfile.js';
 import axios from 'axios';
+import * as cheerio from 'cheerio';
 
 const LC_API = 'https://leetcode.com/graphql/';
 const CF_API = 'https://codeforces.com/api/user.info?handles=';
@@ -62,7 +63,8 @@ const GQLQuery = `
 
 export const getCodingProfile = async (req, res) => {
     try {
-        const { userId } = req.params;
+        // Support both admin (params) and trainee (auth token) access
+        const userId = req.params.userId || req.user.id;
         const profile = await CodingProfile.findOne({ user: userId });
 
         let leetcodeData = null;
@@ -173,35 +175,41 @@ export const getCodingProfile = async (req, res) => {
                 const ccResponse = await axios.get(`https://www.codechef.com/users/${handle}`);
 
                 if (ccResponse.status === 200) {
-                    const data = ccResponse.data;
+                    const $ = cheerio.load(ccResponse.data);
 
-                    // Helper to safely match regex
-                    const extract = (pattern) => {
-                        const match = data.match(pattern);
-                        return match ? match[1] : null;
-                    };
+                    const name = $('h1.h2-style').text().trim() || handle;
+                    const avatar = $('header.sidebar-header img').attr('src') || $('.user-details-container img').attr('src');
+                    const rating = parseInt($('.rating-number').text().replace(/\D/g, '')) || 0;
+                    const maxRating = parseInt($('small').text().match(/Highest Rating (\d+)/)?.[1]) || 0;
 
-                    const name = extract(/<h1 class="h2-style">([^<]+)<\/h1>/) || handle;
-                    const avatar = extract(/<img src="([^"]+)" class="getImage"/) || extract(/<div class="user-details-container">[\s\S]*?<img src="([^"]+)"/);
-                    const currentRating = parseInt(extract(/<div class="rating-number">(\d+)<\/div>/)) || 0;
-                    const maxRating = parseInt(extract(/<small>\(Highest Rating (\d+)\)<\/small>/)) || 0;
-                    const globalRank = parseInt(extract(/<a href="\/ratings\/all"><strong>(\d+)<\/strong><\/a>/)) || 0;
-                    const countryRank = parseInt(extract(/<a href="\/ratings\/all\?country=[^"]+"><strong>(\d+)<\/strong><\/a>/)) || 0;
-                    const stars = extract(/<div class="rating-star">[\s\S]*?<span>([^<]+)<\/span>/) || extract(/<span class="rating">([^<]+)<\/span>/) || "unrated";
-                    const countryFlag = extract(/<img class="user-country-flag" src="([^"]+)"/) || '';
-                    const countryName = extract(/<span class="user-country-name">([^<]+)<\/span>/) || '';
+                    const globalRank = parseInt($('.rating-ranks ul li').filter((_, el) => $(el).text().includes('Global Rank')).find('strong').text()) || 0;
+                    const countryRank = parseInt($('.rating-ranks ul li').filter((_, el) => $(el).text().includes('Country Rank')).find('strong').text()) || 0;
+
+                    // Star Rating: Count number of spans with background color inside .rating-star
+                    let stars = $('.rating-star span').length;
+                    if (stars === 0) {
+                        // Fallback attempts
+                        const starText = $('.rating-star').text().trim(); // sometimes it's text like "1★"
+                        if (starText) stars = starText;
+                    } else {
+                        stars = `${stars}★`;
+                    }
+
+                    // Country
+                    const countryFlag = $('.user-country-flag').attr('src') || '';
+                    const countryName = $('.user-country-name').text().trim();
 
                     codechefData = {
                         username: handle,
-                        name: name.trim(),
-                        avatar: avatar,
-                        rating: currentRating,
-                        maxRating: maxRating,
-                        globalRank: globalRank,
-                        countryRank: countryRank,
-                        stars: stars.trim(),
-                        countryFlag: countryFlag,
-                        countryName: countryName.trim()
+                        name,
+                        avatar,
+                        rating,
+                        maxRating,
+                        globalRank,
+                        countryRank,
+                        stars,
+                        countryFlag,
+                        countryName
                     };
                 }
             } catch (error) {
@@ -235,7 +243,7 @@ export const getCodingProfile = async (req, res) => {
 
 export const updateCodingProfile = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const userId = req.params.userId || req.user.id;
         const { leetcode, codeforces, codechef, hackerrank } = req.body;
 
         let profile = await CodingProfile.findOne({ user: userId });

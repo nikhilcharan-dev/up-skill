@@ -1,0 +1,22 @@
+.topic-details-layout {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background: white;
+    /* Base bg */
+}
+
+.topic-main-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.topic-content-scroll {
+    flex: 1;
+    overflow-y: auto;
+    background: #f0f4f8;
+    /* Muted bg for table area */
+}

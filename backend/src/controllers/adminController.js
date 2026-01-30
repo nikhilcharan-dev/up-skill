@@ -9,6 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { sendMail } from '../utils/sendMail.js';
+import { sendWelcomeEmail, sendBatchEnrollmentEmail } from '../services/emailService.js';
 import multer from 'multer';
 import { storage } from '../config/cloudinary.js';
 
@@ -316,7 +317,7 @@ export const createBatch = async (req, res) => {
 export const bulkAddTrainees = async (req, res) => {
     try {
         let { emails, batchId } = req.body;
-        const batch = await Batch.findById(batchId);
+        const batch = await Batch.findById(batchId).populate('course');
         if (!batch) return res.status(404).json({ msg: 'Batch not found' });
 
         // Handle File Upload (Excel)
@@ -341,6 +342,8 @@ export const bulkAddTrainees = async (req, res) => {
 
         for (const email of emails) {
             let user = await User.findOne({ workEmail: email });
+            let isNewToBatch = false;
+
             if (!user) {
                 user = new User({
                     name: email.split('@')[0],
@@ -350,19 +353,44 @@ export const bulkAddTrainees = async (req, res) => {
                     assignedBatches: [batch._id]
                 });
                 await user.save();
+                isNewToBatch = true; // New user is definitely new to batch
+
+                // Send welcome email to new trainee
+                try {
+                    await sendWelcomeEmail(email, user.name, 'trainee123', 'Trainee');
+                } catch (emailErr) {
+                    console.error(`Failed to send welcome email to ${email}:`, emailErr);
+                }
             } else {
                 // If user exists, ensure they are a trainee and add this batch if not already there
                 if (user.role === 'trainee') {
                     if (!user.assignedBatches.includes(batch._id)) {
                         user.assignedBatches.push(batch._id);
                         await user.save();
+                        isNewToBatch = true;
                     }
                 }
             }
             if (user && !batch.trainees.includes(user._id)) {
                 batch.trainees.push(user._id);
+                // Note: user.assignedBatches check above confirms logic, safe to rely on isNewToBatch
             }
             if (user) addedTrainees.push(user);
+
+            // Send Batch Enrollment Email if they were newly added to this batch
+            if (isNewToBatch && user) {
+                try {
+                    await sendBatchEnrollmentEmail(
+                        email,
+                        user.name,
+                        batch.name,
+                        batch.course?.title || 'Course',
+                        batch.startDate
+                    );
+                } catch (batchEmailErr) {
+                    console.error(`Failed to send batch enrollment email to ${email}:`, batchEmailErr);
+                }
+            }
         }
 
         await batch.save();
@@ -674,9 +702,7 @@ export const createTrainer = async (req, res) => {
             return res.status(400).json({ msg: 'Please provide name and email.' });
         }
 
-        const existingUser = await User.findOne({
-            $or: [{ workEmail: email }, { collegeEmail: email }]
-        });
+        const existingUser = await User.findOne({ workEmail: email });
 
         if (existingUser) {
             return res.status(400).json({ msg: 'User with this email already exists.' });
@@ -697,26 +723,8 @@ export const createTrainer = async (req, res) => {
 
         await newTrainer.save();
 
-        // Send email
-        const emailContent = `
-            <div style="font-family: Arial, sans-serif; color: #333;">
-                <h2>Welcome to Owl Code!</h2>
-                <p>Hello ${name},</p>
-                <p>You have been added as a Trainer. Here are your login credentials:</p>
-                <ul>
-                    <li><strong>Email:</strong> ${email}</li>
-                    <li><strong>Password:</strong> ${password}</li>
-                </ul>
-                <p>Please login at: <a href="http://owlcode.adityauniversity.in/login">Owl Code Portal</a></p>
-                <p>Happy Onboarding!</p>
-            </div>
-        `;
-
-        await sendMail({
-            to: email,
-            subject: 'Welcome to Owl Code - Trainer Credentials',
-            html: emailContent
-        });
+        // Send email using new service
+        await sendWelcomeEmail(email, name, password, 'Trainer');
 
         res.status(201).json({
             msg: 'Trainer created successfully and email sent', trainer: {

@@ -1,0 +1,25 @@
+.layout-container {
+    display: flex;
+    height: 100%;
+    width: 100vw;
+    overflow: hidden;
+    background-color: var(--bg-primary);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    gap: 0;
+    overflow: hidden;
+    width: 100%;
+}
+
+.content-scroll {
+    flex: 1;
+    overflow-y: hidden;
+    /* ModulesPage manages its own scroll */
+    border-radius: 0;
+}

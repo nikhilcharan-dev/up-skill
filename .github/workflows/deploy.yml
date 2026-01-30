@@ -14,29 +14,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup SSH
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.VM_SSH_KEY }}
+
+      - name: Add server to known_hosts
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy Backend + Frontend
         run: |
           ssh ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-          
-          echo "🚀 Deploying Backend..."
+
+          echo "🚀 Backend"
           cd /var/www/owl-code/backend
           git pull origin main
           npm install
-          pm2 restart upskill-server || pm2 start src/server.js --name owl-backend
+          pm2 restart upskill-server || pm2 start src/server.js --name upskill-server
 
-          echo "🎨 Deploying Frontend..."
+          echo "🎨 Frontend"
           cd /var/www/owl-code/frontend
           git pull origin main
           npm install
           npm run build
           pm2 restart upskill-admin || pm2 start npm --name upskill-admin -- start
 
-          echo "✅ Deployment complete"
+          echo "✅ Deployment successful"
           EOF

@@ -8,18 +8,21 @@ on:
 jobs:
   debug:
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
-      - name: Show runner info
+      - name: Debug secret lengths
+        env:
+          VM_SSH_KEY: ${{ secrets.VM_SSH_KEY }}
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
         run: |
-          echo "Runner IP info:"
-          ip a
-          echo "----"
-          curl ifconfig.me
+          echo "VM_SSH_KEY length: ${#VM_SSH_KEY}"
+          echo "VM_HOST length: ${#VM_HOST}"
+          echo "VM_USER length: ${#VM_USER}"
 
       - name: Check port 22 connectivity
         run: |
-          echo "Testing TCP connection to port 22..."
           nc -zv ${{ secrets.VM_HOST }} 22 || echo "PORT 22 NOT REACHABLE"
 
       - name: Setup SSH Agent

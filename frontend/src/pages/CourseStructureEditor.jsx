@@ -156,8 +156,8 @@ function CourseStructureEditor() {
         }
     };
 
-    if (loading) return <div className="page p-8 flex items-center justify-center text-muted">Loading Course...</div>;
-    if (!course) return <div className="page p-8 text-center text-red-500">Course not found</div>;
+    if (loading) return <div className="page-loading">Loading Course...</div>;
+    if (!course) return <div className="page-error">Course not found</div>;
 
     return (
         <div className="page course-structure-editor">
@@ -166,9 +166,9 @@ function CourseStructureEditor() {
                     <Link to="/admin/courses" className="nav-link">← Back to Courses</Link>
                 </nav>
 
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex-between mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold text-gradient mb-2">
+                        <h1 className="course-title-large">
                             {course.title}
                         </h1>
                         <p className="text-muted">Manage modules and schedule for this course.</p>
@@ -205,8 +205,8 @@ function CourseStructureEditor() {
                 {!showCalendar && (
                     <div className="structure-content animate">
                         {course.modules?.length === 0 && (
-                            <div className="text-center p-12 border-2 border-dashed border-white-5 rounded-xl bg-glass">
-                                <span className="text-4xl block mb-4 opacity-50">Folder Empty</span>
+                            <div className="empty-modules-state">
+                                <span className="empty-icon">Folder Empty</span>
                                 <p className="text-muted mb-6">No modules added yet.</p>
                                 <Button onClick={openAddModule} variant="primary">Add Module from Library</Button>
                             </div>
@@ -231,17 +231,7 @@ function CourseStructureEditor() {
                                         <div className="card-header">
                                             <div className="module-index-badge">Module {mIdx + 1}</div>
                                             {isModuleLocked(module._id) && (
-                                                <span className="lock-badge" style={{
-                                                    background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                                                    padding: '0.25rem 0.5rem',
-                                                    borderRadius: '0.375rem',
-                                                    fontSize: '0.75rem',
-                                                    fontWeight: '600',
-                                                    color: 'white',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '0.25rem'
-                                                }}>
+                                                <span className="lock-badge-custom">
                                                     🔒 Locked
                                                 </span>
                                             )}
@@ -250,7 +240,7 @@ function CourseStructureEditor() {
                                                     size="sm"
                                                     variant={isModuleLocked(module._id) ? "success" : "warning"}
                                                     onClick={(e) => toggleModuleLock(e, module)}
-                                                    className="py-1 px-2 text-xs"
+                                                    className="action-btn-sm"
                                                     title={isModuleLocked(module._id) ? "Unlock module for trainees" : "Lock module from trainees"}
                                                 >
                                                     {isModuleLocked(module._id) ? '🔓 Unlock' : '🔒 Lock'}
@@ -263,7 +253,7 @@ function CourseStructureEditor() {
                                                         setSelectedModuleForScheduling(module);
                                                         setModalType('schedule');
                                                     }}
-                                                    className="py-1 px-2 text-xs"
+                                                    className="action-btn-sm"
                                                 >
                                                     Schedule
                                                 </Button>
@@ -271,25 +261,25 @@ function CourseStructureEditor() {
                                                     size="sm"
                                                     variant="danger"
                                                     onClick={(e) => unlinkModule(e, mIdx)}
-                                                    className="py-1 px-2 text-xs"
+                                                    className="action-btn-sm"
                                                 >
                                                     Remove
                                                 </Button>
                                             </div>
                                         </div>
 
-                                        <h3 className="module-title group-hover:text-blue-400 transition-colors">{module.title}</h3>
+                                        <h3 className="module-title">{module.title}</h3>
                                         <p className="module-desc">{module.description || 'No description provided.'}</p>
 
 
                                         <div className="card-footer">
                                             <div className="meta-stats">
                                                 <span className="stat-item">
-                                                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                                                    <span className="status-dot bg-blue-500"></span>
                                                     {totalTopics} Topics
                                                 </span>
                                                 <span className="stat-item">
-                                                    <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                                                    <span className="status-dot bg-purple-500"></span>
                                                     {totalProblems} Problems
                                                 </span>
                                                 {moduleSchedule?.testLink && (
@@ -299,16 +289,7 @@ function CourseStructureEditor() {
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             onClick={(e) => e.stopPropagation()}
-                                                            style={{
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                gap: '0.25rem',
-                                                                color: 'var(--accent-primary)',
-                                                                textDecoration: 'none',
-                                                                transition: 'all 0.2s'
-                                                            }}
-                                                            onMouseOver={(e) => e.target.style.opacity = '0.7'}
-                                                            onMouseOut={(e) => e.target.style.opacity = '1'}
+                                                            className="link-with-icon"
                                                         >
                                                             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
@@ -360,7 +341,7 @@ function CourseStructureEditor() {
                             </select>
                             <p className="text-xs text-muted mt-2">Modules are managed in the Modules Library. Go to Modules → Edit Content to add days/topics.</p>
                         </div>
-                        <div className="flex justify-end gap-3 mt-6">
+                        <div className="modal-actions-custom">
                             <Button variant="secondary" onClick={() => setModalType(null)}>Cancel</Button>
                             <Button type="submit" variant="primary">Add Module</Button>
                         </div>
@@ -390,7 +371,7 @@ function CourseStructureEditor() {
                     )}
                 </Modal>
             </div>
-        </div>
+        </div >
     );
 }
 

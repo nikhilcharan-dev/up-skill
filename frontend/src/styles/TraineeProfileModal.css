@@ -1,0 +1,39 @@
+/* TraineeProfileModal specific styles */
+
+.stat-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 32px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    min-width: 140px;
+    /* Ensure uniform minimum width */
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    /* Space between label and value */
+    line-height: 1;
+    width: 100%;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+.stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}

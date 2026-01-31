@@ -134,7 +134,7 @@ function TopicManager() {
                 <div className="topic-grid">
                     {filteredTopics.length === 0 ? (
                         <div className="empty-state">
-                            <div className="empty-icon text-4xl mb-4 text-[var(--text-muted)] opacity-50"></div>
+                            <div className="empty-topic-icon"></div>
                             <h3 className="text-xl font-bold mb-2">No Topics Found</h3>
                             <p className="text-muted mb-6">
                                 {searchQuery ? `No topics match "${searchQuery}"` : "Create your first topic to get started."}

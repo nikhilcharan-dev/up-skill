@@ -472,7 +472,7 @@ function ViewTraineesModal({ batch, isOpen, onClose }) {
                                                     key={t._id}
                                                     onClick={() => { setSelectedTrainee(t); setShowProfile(true); }}
                                                     style={{ cursor: 'pointer' }}
-                                                    className="hover:bg-white/5 transition-colors"
+                                                    className="hover-bg-subtle"
                                                 >
                                                     <td style={{ fontWeight: 600 }}>{t.name}</td>
                                                     <td className="text-secondary">{t.workEmail}</td>

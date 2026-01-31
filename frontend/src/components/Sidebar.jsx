@@ -21,9 +21,9 @@ function Sidebar({ onClose }) {
     };
 
     return (
-        <aside className="sidebar h-full">
+        <aside className="sidebar">
             <div className="sidebar-header">
-                <h1 className="brand-title">Owl Coder</h1>
+                <h1 className="brand-title">Upskill</h1>
             </div>
 
             <nav className="sidebar-nav">

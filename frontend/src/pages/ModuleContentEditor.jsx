@@ -78,14 +78,14 @@ function ModuleContentEditor() {
 
     if (loading) return (
         <div className="module-editor-page">
-            <div className="flex h-screen items-center justify-center text-muted">
+            <div className="loading-screen">
                 <div className="spinner"></div>
             </div>
         </div>
     );
 
     if (!module) return (
-        <div className="module-editor-page p-8 text-center text-red-400">
+        <div className="module-editor-page error-screen">
             Module not found
         </div>
     );
@@ -116,7 +116,7 @@ function ModuleContentEditor() {
             <div className="editor-layout">
 
                 {/* Left Panel: Content Timeline */}
-                <div className="flex flex-col h-full overflow-hidden">
+                <div className="flex-col-full">
                     {/* Stats Widget */}
                     <div className="stats-grid">
                         <div className="stat-card">
@@ -140,7 +140,7 @@ function ModuleContentEditor() {
                         </h2>
 
                         {linkedTopicsDetails.length === 0 ? (
-                            <div className="h-64 flex flex-col items-center justify-center text-muted border-2 border-dashed border-white-5 rounded-xl opacity-50">
+                            <div className="timeline-empty-state">
                                 <span className="text-4xl mb-4 opacity-50">🧩</span>
                                 <p>No topics added yet.</p>
                                 <p className="text-sm mt-2">Add topics from the library on the right.</p>
@@ -165,7 +165,7 @@ function ModuleContentEditor() {
                                                 <Button
                                                     size="sm"
                                                     variant="secondary"
-                                                    className="bg-red-500/10 text-red-400 border-transparent hover:bg-red-500/20 py-1 px-3 text-xs"
+                                                    className="unlink-btn"
                                                     onClick={() => toggleTopic(topic._id)}
                                                 >
                                                     Unlink
@@ -199,7 +199,7 @@ function ModuleContentEditor() {
                 </div>
 
                 {/* Right Panel: Topic Library */}
-                <div className="sidebar-panel rounded-xl border border-white-5 overflow-hidden">
+                <div className="sidebar-panel sidebar-panel-container">
                     <div className="sidebar-header">
                         <h2 className="sidebar-title">
                             <span className="opacity-70">📚</span>
@@ -248,7 +248,7 @@ function ModuleContentEditor() {
                 </div>
 
             </div>
-        </div>
+        </div >
     );
 }
 

@@ -1,5 +1,19 @@
 /* BatchManager.css */
 
+.overflow-x-auto {
+    overflow-x: auto;
+}
+
+.min-w-full {
+    min-width: 100%;
+}
+
+.hover-bg-subtle:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: background-color 0.2s ease;
+}
+
+
 .batch-date {
     font-size: 0.85rem;
 }

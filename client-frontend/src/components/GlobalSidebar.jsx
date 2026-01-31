@@ -17,7 +17,7 @@ const GlobalSidebar = ({ isOpen, onClose, courses }) => {
                     <button className="close-btn" onClick={onClose}>
                         <X size={24} />
                     </button>
-                    <span className="sidebar-title">Owl Coder</span>
+                    <span className="sidebar-title">Upskill</span>
                 </div>
 
                 <div className="sidebar-content">

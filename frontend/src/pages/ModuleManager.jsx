@@ -120,7 +120,7 @@ function ModuleManager() {
                     {modules.map((module) => (
                         <div key={module._id} className="module-card">
                             <div className="module-card-header">
-                                <div className="flex justify-between items-start mb-2">
+                                <div className="flex-between-start mb-2">
                                     <h3 className="module-title mb-0">{module.title}</h3>
                                 </div>
                                 <p className="module-desc">{module.description || 'No description provided.'}</p>
@@ -181,7 +181,7 @@ function ModuleManager() {
 
                         <div className="form-group">
                             <label className="label-premium">Assign to Courses</label>
-                            <div className="space-y-2 max-h-48 overflow-y-auto border border-white-10 rounded-lg p-2 bg-glass">
+                            <div className="courses-list-container">
                                 {courses.length === 0 ? (
                                     <p className="text-muted text-sm p-2">No courses available</p>
                                 ) : (
@@ -198,7 +198,7 @@ function ModuleManager() {
                                                         setFormData({ ...formData, assignedCourses: currentAssigned.filter(id => id !== course._id) });
                                                     }
                                                 }}
-                                                className="mr-3 w-4 h-4 accent-blue-500"
+                                                className="checkbox-input"
                                             />
                                             <span className="text-sm text-gray-300">{course.title}</span>
                                         </label>
@@ -207,7 +207,7 @@ function ModuleManager() {
                             </div>
                             <p className="text-xs text-muted mt-2">💡 Modules can be shared across multiple courses.</p>
                         </div>
-                        <div className="flex justify-end gap-3 mt-8">
+                        <div className="flex-end-gap">
                             <Button variant="secondary" onClick={() => setModalType(null)} type="button">Cancel</Button>
                             <Button type="submit" variant="primary">Save Module</Button>
                         </div>

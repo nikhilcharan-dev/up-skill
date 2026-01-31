@@ -2,15 +2,16 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import '../styles/Sidebar.css';
+import '../styles/AdminLayout.css';
 
 function AdminLayout() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
-        <div className="admin-layout flex h-screen overflow-hidden bg-[var(--bg-primary)]">
+        <div className="admin-layout">
             {/* Mobile Header */}
             <header className="mobile-header">
-                <h1 className="brand-title-mobile">Owl Coder</h1>
+                <h1 className="brand-title-mobile">Upskill</h1>
                 <button
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                     className="mobile-toggle-btn"

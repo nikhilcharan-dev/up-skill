@@ -153,8 +153,103 @@
     font-size: 1rem;
     display: flex;
     align-items: center;
+    opacity: 1;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+    width: 100%;
     gap: 0.5rem;
 }
+
+/* Helper Classes replacing Tailwind */
+.text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.text-gradient {
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.mt-6 {
+    margin-top: 1.5rem;
+}
+
+.pt-4 {
+    padding-top: 1rem;
+}
+
+.gap-3 {
+    gap: 0.75rem;
+}
+
+.gap-4 {
+    gap: 1rem;
+}
+
+.border-t {
+    border-top-width: 1px;
+}
+
+.border-white-5 {
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.w-full {
+    width: 100%;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.grid-cols-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.flex-end-gap {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.p-2 {
+    padding: 0.5rem;
+}
+
+.space-y-4>*+* {
+    margin-top: 1rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.opacity-30 {
+    opacity: 0.3;
+}
+
+.text-right {
+    text-align: right;
+}
+
 
 .problem-link-icon {
     display: inline-flex;

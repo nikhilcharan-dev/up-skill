@@ -337,7 +337,7 @@ function ProblemLibrary() {
                             />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid-cols-2 gap-4">
                             <div>
                                 <label className="label-premium">Platform</label>
                                 <select
@@ -366,7 +366,7 @@ function ProblemLibrary() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid-cols-2 gap-4">
                             <div>
                                 <label className="label-premium">Category</label>
                                 <select
@@ -391,7 +391,7 @@ function ProblemLibrary() {
                             </div>
                         </div>
 
-                        <div className="flex justify-end gap-3 pt-4 border-t border-white-5 mt-6">
+                        <div className="flex-end-gap pt-4 border-t border-white-5 mt-6">
                             <Button variant="secondary" onClick={() => setModalType(null)} type="button">Cancel</Button>
                             <Button type="submit" variant="primary">
                                 {modalType === 'create' ? 'Create Problem' : 'Save Changes'}

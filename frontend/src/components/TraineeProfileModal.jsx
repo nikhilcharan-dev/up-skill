@@ -4,6 +4,7 @@ import Modal from './Modal';
 import Button from './Button';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import '../styles/TraineeProfileModal.css';
 const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
     const navigate = useNavigate();
 
@@ -294,18 +295,16 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
 
                                                 {/* Unique Rank & Rating Styling */}
                                                 <div className="flex gap-3">
-                                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2d2d] border border-white/10 shadow-sm">
-                                                        <span className="text-sm">Rank</span>
-                                                        <div className="flex flex-col leading-none">
-                                                            <span className="text-[0.6rem] text-muted uppercase font-bold tracking-wider">Rank</span>
-                                                            <span className="text-sm font-bold text-white">{leetcodeData.ranking?.toLocaleString() || 'N/A'}</span>
+                                                    <div className="stat-box">
+                                                        <div className="stat-content">
+                                                            <span className="stat-label">Rank</span>
+                                                            <span className="stat-value">{leetcodeData.ranking?.toLocaleString() || 'N/A'}</span>
                                                         </div>
                                                     </div>
-                                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2d2d] border border-white/10 shadow-sm">
-                                                        <span className="text-sm">Rating</span>
-                                                        <div className="flex flex-col leading-none">
-                                                            <span className="text-[0.6rem] text-muted uppercase font-bold tracking-wider">Rating</span>
-                                                            <span className="text-sm font-bold text-white">{leetcodeData.contest?.rating || 'N/A'}</span>
+                                                    <div className="stat-box">
+                                                        <div className="stat-content">
+                                                            <span className="stat-label">Rating</span>
+                                                            <span className="stat-value">{leetcodeData.contest?.rating || 'N/A'}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -478,20 +477,18 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
                                                 <p className="text-sm font-medium opacity-80 mb-2">@{codeforcesData.username}</p>
 
                                                 <div className="flex gap-3">
-                                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2d2d] border border-white/10 shadow-sm">
-                                                        <span className="text-sm">Rating</span>
-                                                        <div className="flex flex-col leading-none">
-                                                            <span className="text-[0.6rem] text-muted uppercase font-bold tracking-wider">Rating</span>
-                                                            <span className="text-sm font-bold" style={{ color: codeforcesData.rating >= 2400 ? '#ff0000' : codeforcesData.rating >= 2100 ? '#ff8c00' : codeforcesData.rating >= 1900 ? '#a0a' : codeforcesData.rating >= 1600 ? '#0000ff' : codeforcesData.rating >= 1400 ? '#03a89e' : codeforcesData.rating >= 1200 ? '#008000' : '#a0a0a0' }}>
+                                                    <div className="stat-box">
+                                                        <div className="stat-content">
+                                                            <span className="stat-label">Rating</span>
+                                                            <span className="stat-value" style={{ color: codeforcesData.rating >= 2400 ? '#ff0000' : codeforcesData.rating >= 2100 ? '#ff8c00' : codeforcesData.rating >= 1900 ? '#a0a' : codeforcesData.rating >= 1600 ? '#0000ff' : codeforcesData.rating >= 1400 ? '#03a89e' : codeforcesData.rating >= 1200 ? '#008000' : '#a0a0a0' }}>
                                                                 {codeforcesData.rating}
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2d2d] border border-white/10 shadow-sm">
-                                                        <span className="text-sm">Max</span>
-                                                        <div className="flex flex-col leading-none">
-                                                            <span className="text-[0.6rem] text-muted uppercase font-bold tracking-wider">Max</span>
-                                                            <span className="text-sm font-bold text-white">{codeforcesData.maxRating}</span>
+                                                    <div className="stat-box">
+                                                        <div className="stat-content">
+                                                            <span className="stat-label">Max</span>
+                                                            <span className="stat-value">{codeforcesData.maxRating}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -577,18 +574,16 @@ const TraineeProfileModal = ({ isOpen, onClose, trainee }) => {
                                                 <p className="text-sm font-medium opacity-80 mb-2">@{codechefData.username}</p>
 
                                                 <div className="flex gap-3">
-                                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2d2d] border border-white/10 shadow-sm">
-                                                        <span className="text-sm">Rating</span>
-                                                        <div className="flex flex-col leading-none">
-                                                            <span className="text-[0.6rem] text-muted uppercase font-bold tracking-wider">Rating</span>
-                                                            <span className="text-sm font-bold text-[#5B4638]">{codechefData.rating}</span>
+                                                    <div className="stat-box">
+                                                        <div className="stat-content">
+                                                            <span className="stat-label">Rating</span>
+                                                            <span className="stat-value" style={{ color: '#5B4638' }}>{codechefData.rating}</span>
                                                         </div>
                                                     </div>
-                                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2d2d] border border-white/10 shadow-sm">
-                                                        <span className="text-sm">High</span>
-                                                        <div className="flex flex-col leading-none">
-                                                            <span className="text-[0.6rem] text-muted uppercase font-bold tracking-wider">High</span>
-                                                            <span className="text-sm font-bold text-white">{codechefData.maxRating}</span>
+                                                    <div className="stat-box">
+                                                        <div className="stat-content">
+                                                            <span className="stat-label">High</span>
+                                                            <span className="stat-value">{codechefData.maxRating}</span>
                                                         </div>
                                                     </div>
                                                 </div>

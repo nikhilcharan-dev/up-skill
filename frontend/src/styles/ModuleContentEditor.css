@@ -372,3 +372,87 @@
     color: var(--text-primary) !important;
     transform: translateX(-2px);
 }
+
+/* Helper Classes replacing Tailwind */
+.text-gradient {
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.loading-screen {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+}
+
+.error-screen {
+    padding: 2rem;
+    text-align: center;
+    color: #f87171;
+    /* red-400 */
+}
+
+.flex-col-full {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.timeline-empty-state {
+    height: 16rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    border: 2px dashed rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    opacity: 0.5;
+}
+
+.text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+}
+
+.opacity-50 {
+    opacity: 0.5;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+.unlink-btn {
+    background: rgba(239, 68, 68, 0.1);
+    /* bg-red-500/10 */
+    color: #f87171;
+    /* text-red-400 */
+    border: 1px solid transparent;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+}
+
+.unlink-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    /* hover:bg-red-500/20 */
+}
+
+.sidebar-panel-container {
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}

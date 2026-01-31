@@ -21,7 +21,7 @@ const Navbar = ({ onMenuClick }) => {
                 </button>
                 <div className="brand-logo">
                     <BookOpen size={24} className="brand-icon" />
-                    <span className="brand-name">Owl Coder</span>
+                    <span className="brand-name">Upskill</span>
                 </div>
                 <Link to="/dashboard" className="nav-link">
                     Courses

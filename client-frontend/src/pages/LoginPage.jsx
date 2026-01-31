@@ -33,7 +33,7 @@ const LoginPage = () => {
             <div className="login-card">
                 <div className="login-logo">
                     <BookOpen size={32} className="logo-icon" />
-                    <h1>Owl Coder</h1>
+                    <h1>Upskill</h1>
                 </div>
 
                 <p className="login-subtitle">Sign in to access your dashboard</p>

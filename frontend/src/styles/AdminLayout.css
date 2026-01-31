@@ -1,0 +1,103 @@
+/* AdminLayout.css */
+
+.admin-layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    background-color: var(--bg-primary);
+    position: relative;
+    width: 100vw;
+}
+
+.mobile-header {
+    display: none;
+    /* Hidden by default on desktop */
+}
+
+.sidebar-container {
+    height: 100%;
+    z-index: 50;
+    width: 260px;
+    /* Fixed width for sidebar */
+    flex-shrink: 0;
+    background-color: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+    transition: transform 0.3s ease;
+}
+
+.admin-main-content {
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+    min-width: 0;
+    /* Prevent flex items from overflowing */
+}
+
+.page-content-wrapper {
+    padding: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .admin-layout {
+        flex-direction: column;
+    }
+
+    .mobile-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        background-color: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+        z-index: 60;
+    }
+
+    .brand-title-mobile {
+        font-size: 1.25rem;
+        font-weight: 800;
+        margin: 0;
+        background: var(--accent-gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .mobile-toggle-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .sidebar-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        transform: translateX(-100%);
+        width: 280px;
+        box-shadow: var(--shadow-xl);
+    }
+
+    .sidebar-container.open {
+        transform: translateX(0);
+    }
+
+    .mobile-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 40;
+        backdrop-filter: blur(4px);
+    }
+
+    .page-content-wrapper {
+        padding: 1rem;
+    }
+}

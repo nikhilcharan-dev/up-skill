@@ -36,6 +36,7 @@
     /* Border width */
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     transition: opacity 0.3s ease;
@@ -72,6 +73,7 @@
     line-height: 1.5;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     margin-bottom: 1.5rem;
@@ -229,4 +231,94 @@ input:checked+.slider:before {
 
 .toggle-label.active {
     color: var(--accent-primary);
+}
+
+/* Helper Classes replacing Tailwind */
+.text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-6 {
+    margin-bottom: 1.5rem;
+}
+
+.p-2 {
+    padding: 0.5rem;
+}
+
+.p-4 {
+    padding: 1rem;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.flex-between-start {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.flex-end-gap {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 2rem;
+}
+
+.courses-list-container {
+    max-height: 12rem;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    /* bg-glass */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.checkbox-input {
+    margin-right: 0.75rem;
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
 }

@@ -180,6 +180,170 @@
     background: var(--bg-card-hover);
 }
 
-.checkbox-option input {
-    margin-right: 0.75rem;
+/* Helper Classes replacing Tailwind */
+.text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+}
+
+.text-4xl {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.mb-6 {
+    margin-bottom: 1.5rem;
+}
+
+.mb-8 {
+    margin-bottom: 2rem;
+}
+
+.p-2 {
+    padding: 0.5rem;
+}
+
+.p-4 {
+    padding: 1rem;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.gap-3 {
+    gap: 0.75rem;
+}
+
+.mt-8 {
+    margin-top: 2rem;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-row {
+    flex-direction: row;
+}
+
+.items-start {
+    align-items: flex-start;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.justify-end {
+    justify-content: flex-end;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.relative {
+    position: relative;
+}
+
+.text-gradient {
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.text-green-400 {
+    color: #4ade80;
+}
+
+.text-purple-500 {
+    color: #a855f7;
+}
+
+.accent-purple-500 {
+    accent-color: #a855f7;
+}
+
+.opacity-50 {
+    opacity: 0.5;
+}
+
+.whitespace-nowrap {
+    white-space: nowrap;
+}
+
+.flex-shrink-0 {
+    flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+    .md\:flex-row {
+        flex-direction: row;
+    }
+
+    .md\:items-center {
+        align-items: center;
+    }
+
+    .md\:w-auto {
+        width: auto;
+    }
+
+    .md\:w-64 {
+        width: 16rem;
+    }
 }

@@ -147,8 +147,8 @@ function TopicContentEditor() {
         }
     };
 
-    if (loading) return <div className="topic-editor-page flex items-center justify-center">Loading Editor...</div>;
-    if (!topic) return <div className="topic-editor-page flex items-center justify-center text-red-500">Topic not found</div>;
+    if (loading) return <div className="topic-editor-page flex-center">Loading Editor...</div>;
+    if (!topic) return <div className="topic-editor-page flex-center text-red-500">Topic not found</div>;
 
     return (
         <div className="topic-editor-page">
@@ -330,12 +330,11 @@ function TopicContentEditor() {
                     />
 
                     {/* Filters Row */}
-                    <div className="modal-filters-row" style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem' }}>
+                    <div className="modal-filters-row">
                         <select
                             className="modal-filter-input"
                             value={filterCategory}
                             onChange={(e) => setFilterCategory(e.target.value)}
-                            style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
                         >
                             <option value="">All Topics</option>
                             <option value="DSA">DSA</option>
@@ -349,7 +348,6 @@ function TopicContentEditor() {
                             className="modal-filter-input"
                             value={filterDifficulty}
                             onChange={(e) => setFilterDifficulty(e.target.value)}
-                            style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
                         >
                             <option value="">All Difficulties</option>
                             <option value="Easy">Easy</option>
@@ -363,7 +361,7 @@ function TopicContentEditor() {
                             placeholder="Filter by tags (comma separated)"
                             value={filterTags}
                             onChange={(e) => setFilterTags(e.target.value)}
-                            style={{ flex: 1.5, padding: '0.5rem', borderRadius: '6px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                            style={{ flex: 1.5 }}
                         />
                     </div>
 
@@ -399,7 +397,7 @@ function TopicContentEditor() {
                         })}
                         {availableProblems.length === 0 && <p className="text-[var(--text-muted)] text-center py-4">No matching problems found.</p>}
                     </div>
-                    <div className="flex justify-end pt-4 border-t border-[var(--border-color)]">
+                    <div className="modal-footer">
                         <Button variant="secondary" onClick={() => setDetailsModalOpen(false)}>Done</Button>
                     </div>
                 </div>

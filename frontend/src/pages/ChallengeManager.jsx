@@ -131,7 +131,7 @@ function ChallengeManager() {
                         <p className="text-muted">No challenges found. Create a new one to engage your trainees!</p>
                     </div>
                 ) : (
-                    <div className="grid grid-2" ref={cardsContainerRef}>
+                    <div className="challenge-grid" ref={cardsContainerRef}>
                         {challenges.map((challenge) => (
                             <div key={challenge._id} className="card course-card animate-card">
                                 <div className="challenge-card-header">
@@ -195,7 +195,7 @@ function ChallengeManager() {
                             />
                         </div>
 
-                        <div className="grid grid-2">
+                        <div className="form-grid-2">
                             <div className="form-group">
                                 <label className="form-label">Duration (Days)</label>
                                 <input

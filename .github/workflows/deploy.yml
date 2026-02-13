@@ -37,14 +37,17 @@ jobs:
           git pull origin main
           npm install
           npm run build
-          pm2 restart upskill-admin || pm2 start npm --name upskill-admin -- start
-
+          pm2 delete upskill-admin || true
+          pm2 start npx --name upskill-admin -- serve -s dist -l 3001
+          
           echo "Updating Frontend"
           cd /var/www/up-skill/client-frontend
           git pull origin main
           npm install
           npm run build
-          pm2 restart upskill-client || pm2 start npm --name upskill-client -- start
+          pm2 delete upskill-client || true
+          pm2 start npx --name upskill-client -- serve -s dist -l 3000
+          
 
-          echo "Deploy complete ✅"
+  echo "Deploy complete ✅"
           EOF

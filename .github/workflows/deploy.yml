@@ -48,6 +48,6 @@ jobs:
           pm2 delete upskill-client || true
           pm2 start npx --name upskill-client -- serve -s dist -l 3000
           
-
-  echo "Deploy complete ✅"
-          EOF
+  
+          echo "Deploy complete ✅"
+                  EOF
